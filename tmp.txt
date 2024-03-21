@@ -1,0 +1,18 @@
+ Volume in drive C is Windows 
+ Volume Serial Number is 84A2-15F3
+
+ Directory of C:\CORE\Massey_Papers_2023\159342_2023\assignments\A1\A1-START-UP\A1_FTP_startup_vscode_windows_v3
+
+30/05/2023  11:50 am    <DIR>          .
+30/05/2023  11:50 am    <DIR>          ..
+02/04/2023  06:19 am    <DIR>          .vscode
+18/02/2019  10:24 am           100,376 black.jpg
+24/08/2016  04:02 pm                18 clean.bat
+02/04/2023  06:12 am    <DIR>          images
+21/03/2022  09:15 pm               176 makefile
+28/03/2023  09:11 pm            21,186 server.cpp
+30/05/2023  11:49 am           152,648 server.exe
+30/05/2023  11:49 am            11,265 server.o
+30/05/2023  11:50 am                 0 tmp.txt
+               7 File(s)        285,669 bytes
+               4 Dir(s)  631,166,865,408 bytes free
