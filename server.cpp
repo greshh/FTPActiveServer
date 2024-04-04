@@ -103,8 +103,8 @@ file_type = FileType::UNKNOWN;
 		 printf("\n============================================\n");
 		 printf("   << 159.342 Cross-platform FTP Server >>");
 		 printf("\n============================================\n");
-		 printf("   submitted by:     ");
-		 printf("\n           date:     ");
+		 printf("   submitted by: Greshka Lao, Any (Hoi Yi) Kwok");
+		 printf("\n           date:     15/04/24");
 		 printf("\n============================================\n");
 	
 		 
@@ -123,8 +123,8 @@ file_type = FileType::UNKNOWN;
 		 //CONTROL CONNECTION:  port number = content of argv[1]
 		 if (argc == 2) {
 			 localaddr.sin_port = htons((u_short)atoi(argv[1])); //ipv4 only, needs replacing. In our lectures, we have an 
-			 																										 //elegant way of resolving the local address and port to 
-			 																										 //be used by the server.				
+			 													 //elegant way of resolving the local address and port to 
+			 													 //be used by the server.				
 		 }
 		 else {
 			 localaddr.sin_port = htons(1234);//default listening port //ipv4 only, needs replacing
@@ -402,7 +402,7 @@ file_type = FileType::UNKNOWN;
 					 local_data_addr_act.sin_port=htons(port_dec); //ipv4 only, needs to be replaced
 
 
-           //Note: the following connect() function is not correctly placed.  It works, but technically, as defined by
+           // Note: the following connect() function is not correctly placed.  It works, but technically, as defined by
            // the protocol, connect() should occur in another place.  Hint: carefully inspect the lecture on FTP, active operations 
            // to find the answer. 
 					 if (connect(s_data_act, (struct sockaddr *)&local_data_addr_act, (int) sizeof(struct sockaddr)) != 0){
@@ -437,7 +437,7 @@ file_type = FileType::UNKNOWN;
 				 if ( (strncmp(receive_buffer,"LIST",4)==0) || (strncmp(receive_buffer,"NLST",4)==0))   {
 #if defined __unix__ || defined __APPLE__ 
 
-					 int i=system("ls -la > tmp.txt");//change that to 'dir', so windows can understand
+					int i=system("ls -la > tmp.txt");//change that to 'dir', so windows can understand
 			
 #elif defined _WIN32	
 
