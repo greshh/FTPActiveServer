@@ -38,6 +38,7 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <iostream>
+#include <string>
   #define WSVERS MAKEWORD(2,2) /* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
                     //The high-order byte specifies the minor version number; 
                     //the low-order byte specifies the major version number.
@@ -218,10 +219,17 @@ file_type = FileType::UNKNOWN;
 
 //********************************************************************
 //PROCESS COMMANDS/REQUEST FROM USER
-//********************************************************************				 
+//********************************************************************	
+				 char username[BUFFER_SIZE] = "";
+				 char password[BUFFER_SIZE] = "";
+				  			 
 				 if (strncmp(receive_buffer,"USER",4)==0)  {
+					 int i = 5;
+					 while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
+						username[i-5] = receive_buffer[i];
+					 }
 					 printf("Logging in... \n");
-					 count=snprintf(send_buffer,BUFFER_SIZE,"331 Password required (anything will do really... :-) \r\n");
+					 count=snprintf(send_buffer,BUFFER_SIZE,"331 Password required \r\n");
 					 if(count >=0 && count < BUFFER_SIZE){
 					    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
 					 }
@@ -230,8 +238,15 @@ file_type = FileType::UNKNOWN;
 				 }
 				 //---
 				 if (strncmp(receive_buffer,"PASS",4)==0)  {
-					 
-					 count=snprintf(send_buffer,BUFFER_SIZE,"230 Public login sucessful \r\n");					 
+					 int i = 5;
+					 while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
+						password[i-5] = receive_buffer[i];
+					 }
+					 if (username == "napoleon" && password == "342") {
+						 count = snprintf(send_buffer, BUFFER_SIZE, "230 Public login sucessful \r\n");
+					 } else {
+						 count = snprintf(send_buffer, BUFFER_SIZE, "530-User cannot log in. \r\n");
+					 }				 
 					 if(count >=0 && count < BUFFER_SIZE){
 					    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
 					 }
