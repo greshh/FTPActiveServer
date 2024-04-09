@@ -31,6 +31,7 @@
   #include <arpa/inet.h>
   #include <netdb.h> //used by getnameinfo()
   #include <iostream>
+  #include <cstring>
 
 #elif defined __WIN32__
   #include <winsock2.h>
@@ -105,7 +106,7 @@ file_type = FileType::UNKNOWN;
 		 printf("   << 159.342 Cross-platform FTP Server >>");
 		 printf("\n============================================\n");
 		 printf("   submitted by: Greshka Lao, Any (Hoi Yi) Kwok");
-		 printf("\n           date:     15/04/24");
+		 printf("\n           date:     22/04/24");
 		 printf("\n============================================\n");
 	
 		 
@@ -220,14 +221,18 @@ file_type = FileType::UNKNOWN;
 //********************************************************************
 //PROCESS COMMANDS/REQUEST FROM USER
 //********************************************************************	
-				 char username[BUFFER_SIZE] = "";
-				 char password[BUFFER_SIZE] = "";
+				 char username[BUFFER_SIZE];
+				 char password[BUFFER_SIZE];
 				  			 
 				 if (strncmp(receive_buffer,"USER",4)==0)  {
+					 memset(username, '\0', sizeof(username));
+					 memset(password, '\0', sizeof(password));
 					 int i = 5;
 					 while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
 						username[i-5] = receive_buffer[i];
+						i++;
 					 }
+					 printf("%s\n", username);
 					 printf("Logging in... \n");
 					 count=snprintf(send_buffer,BUFFER_SIZE,"331 Password required \r\n");
 					 if(count >=0 && count < BUFFER_SIZE){
@@ -241,8 +246,12 @@ file_type = FileType::UNKNOWN;
 					 int i = 5;
 					 while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
 						password[i-5] = receive_buffer[i];
+						i++;
 					 }
-					 if (username == "napoleon" && password == "342") {
+					 printf("%s\n", password);
+					 char user[] = "napoleon";
+					 char pass[] = "342";
+					 if (strcmp(username, user) == 0 && strcmp(password, pass) == 0) {
 						 count = snprintf(send_buffer, BUFFER_SIZE, "230 Public login sucessful \r\n");
 					 } else {
 						 count = snprintf(send_buffer, BUFFER_SIZE, "530-User cannot log in. \r\n");
@@ -251,6 +260,7 @@ file_type = FileType::UNKNOWN;
 					    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
 					 }
 					 printf("[DEBUG INFO] <-- %s\n", send_buffer);
+					 if (!(strcmp(username, user) == 0 && strcmp(password, pass) == 0)) { break; }
 					 if (bytes < 0) break;
 				 }
 				 //---
@@ -336,8 +346,7 @@ file_type = FileType::UNKNOWN;
 				 }
 				 //---
 				 if (strncmp(receive_buffer,"OPTS",4)==0)  {
-					 printf("unrecognised command \n");
-					 count=snprintf(send_buffer,BUFFER_SIZE,"502 command not implemented\r\n");					 
+					 count = snprintf(send_buffer, BUFFER_SIZE, "550 unrecognized command\r\n");
 					 if(count >=0 && count < BUFFER_SIZE){
 					    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
 					 }
@@ -464,8 +473,8 @@ file_type = FileType::UNKNOWN;
 
            fin=fopen("tmp.txt","r");//open tmp.txt file
 
-					 //snprintf(send_buffer,BUFFER_SIZE,"125 Transfering... \r\n");
-					 //snprintf(send_buffer,BUFFER_SIZE,"150 Opening ASCII mode data connection... \r\n");
+					 snprintf(send_buffer,BUFFER_SIZE,"125 Transfering... \r\n");
+					 snprintf(send_buffer,BUFFER_SIZE,"150 Opening ASCII mode data connection... \r\n");
 					 count=snprintf(send_buffer,BUFFER_SIZE,"150 Opening data connection... \r\n");
 					 if(count >=0 && count < BUFFER_SIZE){					  
 					    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
