@@ -52,7 +52,43 @@
 #define BUFFER_SIZE 256
 enum class FileType{BINARY, TEXT, UNKNOWN};
 
-FileType file_type;  
+FileType file_type;
+
+
+
+
+// Reconnection after Error
+void reconnect(int& s, sockaddr_in6& localaddr){
+    //close the current socket(In Error)
+#if defined __unix__ || defined __APPLE__
+    close(s);
+#elif defined _WIN32
+    closesocket(s);
+#endif
+
+    // reconnected to a new socket
+    s = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+#if defined __unix__ || defined __APPLE__ // for cross planform
+    if (s <0) {
+         			 printf("socket failed\n");
+         		 }
+#elif defined _WIN32
+    //check for errors in socket allocation
+    if (s == INVALID_SOCKET) {
+        printf("Error at socket(): %d\n", WSAGetLastError());
+        //freeaddrinfo(result);
+        WSACleanup();
+        exit(1);//return 1;
+    }
+#endif
+
+    if (bind(s,(struct sockaddr *)(&localaddr),sizeof(localaddr)) != 0) { //old programming style, needs replacing
+        printf("Bind failed!\n");
+        exit(0);
+    }
+
+    listen(s, 5);
+}
 
 //********************************************************************
 //MAIN
@@ -178,6 +214,8 @@ file_type = FileType::UNKNOWN;
 //INFINITE LOOP
 //********************************************************************
 		 int count=0;
+         int reconnectCount = 0;
+         const int maxReconnect = 5;
 		 //====================================================================================
 		 while (1) {//Start of MAIN LOOP
 		 //====================================================================================
@@ -196,7 +234,20 @@ file_type = FileType::UNKNOWN;
 			 ns = accept(s,(struct sockaddr *)(&remoteaddr), &addrlen); 
 #endif
 
-			 if (ns < 0 ) break;
+			 //if (ns < 0 ) break;
+             if (ns<0) {
+                 if (reconnectCount < maxReconnect){
+                     reconnectCount++;
+                     printf("Reconnecting : %d/%d attemps\n", reconnectCount, maxReconnect);
+                     reconnect(reinterpret_cast<int &>(s), localaddr);
+                     continue;
+                 } else {
+                     printf("Maximum Reconnection Reached. Automatically Exit.\n");
+                     break;
+                 }
+             } else {
+                 reconnectCount=0;
+             }
 				 
 			 printf("\n============================================================================\n");
 	 		 //printf("connected to [CLIENT's IP %s , port %d] through SERVER's port %d",
