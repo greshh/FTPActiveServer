@@ -1,18 +1,19 @@
- Volume in drive C is Windows 
- Volume Serial Number is 84A2-15F3
+ Volume in drive C is Windows
+ Volume Serial Number is 3275-AF5C
 
- Directory of C:\CORE\Massey_Papers_2023\159342_2023\assignments\A1\A1-START-UP\A1_FTP_startup_vscode_windows_v3
+ Directory of C:\Users\gresh\OneDrive - Massey University\bsc (comp sci)\2024 semester 1\159342 operating systems and networks\assignments\assignment 01\159342-Assignment-1
 
-30/05/2023  11:50 am    <DIR>          .
-30/05/2023  11:50 am    <DIR>          ..
-02/04/2023  06:19 am    <DIR>          .vscode
-18/02/2019  10:24 am           100,376 black.jpg
-24/08/2016  04:02 pm                18 clean.bat
-02/04/2023  06:12 am    <DIR>          images
-21/03/2022  09:15 pm               176 makefile
-28/03/2023  09:11 pm            21,186 server.cpp
-30/05/2023  11:49 am           152,648 server.exe
-30/05/2023  11:49 am            11,265 server.o
-30/05/2023  11:50 am                 0 tmp.txt
-               7 File(s)        285,669 bytes
-               4 Dir(s)  631,166,865,408 bytes free
+09/04/2024  11:04 pm    <DIR>          .
+25/03/2024  11:39 am    <DIR>          ..
+09/04/2024  11:03 pm    <DIR>          .vscode
+18/02/2019  06:24 am           100,376 black.jpg
+24/08/2016  12:03 pm                18 clean.bat
+18/03/2024  09:21 am    <DIR>          images
+09/04/2024  11:04 am               176 makefile
+04/04/2024  06:55 pm                48 README.md
+09/04/2024  11:04 pm            22,002 server.cpp
+09/04/2024  11:04 pm           158,264 server.exe
+09/04/2024  11:04 pm            11,419 server.o
+09/04/2024  11:05 pm                 0 tmp.txt
+               8 File(s)        292,303 bytes
+               4 Dir(s)  244,835,086,336 bytes free

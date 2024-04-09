@@ -225,6 +225,7 @@ file_type = FileType::UNKNOWN;
 				 char password[BUFFER_SIZE];
 				  			 
 				 if (strncmp(receive_buffer,"USER",4)==0)  {
+					 // this resets the char buffer of both variables.
 					 memset(username, '\0', sizeof(username));
 					 memset(password, '\0', sizeof(password));
 					 int i = 5;
@@ -249,9 +250,10 @@ file_type = FileType::UNKNOWN;
 						i++;
 					 }
 					 printf("%s\n", password);
+					 // we are only allowing one user to log in successfully, as per the details below:
 					 char user[] = "napoleon";
 					 char pass[] = "342";
-					 if (strcmp(username, user) == 0 && strcmp(password, pass) == 0) {
+					 if (strcmp(username, user) == 0 && strcmp(password, pass) == 0) { // both username and password have to be correct in order to sign in.
 						 count = snprintf(send_buffer, BUFFER_SIZE, "230 Public login sucessful \r\n");
 					 } else {
 						 count = snprintf(send_buffer, BUFFER_SIZE, "530-User cannot log in. \r\n");
