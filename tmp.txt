@@ -1,19 +1,12 @@
- Volume in drive C is Windows
- Volume Serial Number is 3275-AF5C
-
- Directory of C:\Users\gresh\OneDrive - Massey University\bsc (comp sci)\2024 semester 1\159342 operating systems and networks\assignments\assignment 01\159342-Assignment-1
-
-09/04/2024  11:04 pm    <DIR>          .
-25/03/2024  11:39 am    <DIR>          ..
-09/04/2024  11:03 pm    <DIR>          .vscode
-18/02/2019  06:24 am           100,376 black.jpg
-24/08/2016  12:03 pm                18 clean.bat
-18/03/2024  09:21 am    <DIR>          images
-09/04/2024  11:04 am               176 makefile
-04/04/2024  06:55 pm                48 README.md
-09/04/2024  11:04 pm            22,002 server.cpp
-09/04/2024  11:04 pm           158,264 server.exe
-09/04/2024  11:04 pm            11,419 server.o
-09/04/2024  11:05 pm                 0 tmp.txt
-               8 File(s)        292,303 bytes
-               4 Dir(s)  244,835,086,336 bytes free
+total 208
+drwxr-xr-x  11 napoleon  staff    352 26 Feb 16:31 .
+drwxr-xr-x@ 11 napoleon  staff    352 26 Feb 14:27 ..
+-rw-r--r--@  1 napoleon  staff   6148 26 Feb 14:44 .DS_Store
+-rwxr-xr-x   1 napoleon  staff    163 26 Feb 15:38 makefile
+drwxr-xr-x   8 napoleon  staff    256 21 Mar  2022 old_A1-START-UP_Windows10_compatible
+-rwxr-xr-x   1 napoleon  staff   1142  6 Apr  2022 sample_ftp_ipv4_interaction.txt
+-rwxr-xr-x   1 napoleon  staff   1173  6 Apr  2022 sample_ftp_ipv6_interaction.txt
+-rwxr-xr-x   1 napoleon  staff  18429 26 Feb 16:31 server.cpp
+-rw-r--r--   1 napoleon  staff   9072 26 Feb 16:31 server.o
+-rwxr-xr-x   1 napoleon  staff  51432 26 Feb 16:31 server.out
+-rwxr-xr-x   1 napoleon  staff      0 26 Feb 16:31 tmp.txt
