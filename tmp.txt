@@ -3,17 +3,25 @@
 
  Directory of C:\Users\gresh\OneDrive - Massey University\bsc (comp sci)\2024 semester 1\159342 operating systems and networks\assignments\assignment 01\159342-Assignment-1
 
-09/04/2024  11:04 pm    <DIR>          .
+14/04/2024  11:31 pm    <DIR>          .
 25/03/2024  11:39 am    <DIR>          ..
+14/04/2024  11:15 pm    <DIR>          .idea
 09/04/2024  11:03 pm    <DIR>          .vscode
 18/02/2019  06:24 am           100,376 black.jpg
 24/08/2016  12:03 pm                18 clean.bat
 18/03/2024  09:21 am    <DIR>          images
-09/04/2024  11:04 am               176 makefile
+14/04/2024  11:15 pm               690 makefile
+14/04/2024  11:15 pm               163 makefile - macOS
+14/04/2024  11:15 pm               176 makefile - Windows
+14/04/2024  11:15 pm             1,161 notes_on_mac_napoleon.txt
+14/04/2024  11:15 pm             1,161 notes_on_mac_napoleon_old.txt
 04/04/2024  06:55 pm                48 README.md
-09/04/2024  11:04 pm            22,002 server.cpp
-09/04/2024  11:04 pm           158,264 server.exe
-09/04/2024  11:04 pm            11,419 server.o
-09/04/2024  11:05 pm                 0 tmp.txt
-               8 File(s)        292,303 bytes
-               4 Dir(s)  244,835,086,336 bytes free
+14/04/2024  11:15 pm             1,142 sample_ftp_ipv4_interaction.txt
+14/04/2024  11:15 pm             1,173 sample_ftp_ipv6_interaction.txt
+14/04/2024  11:30 pm            27,904 server.cpp
+14/04/2024  11:31 pm           186,787 server.exe
+14/04/2024  11:15 pm            24,322 server_REDO.cpp
+14/04/2024  11:31 pm                 0 tmp.txt
+14/04/2024  11:15 pm            71,993 white.jpg
+              15 File(s)        417,114 bytes
+               5 Dir(s)  243,966,234,624 bytes free
