@@ -181,8 +181,6 @@ int main(int argc, char *argv[]) {
   char send_buffer[BUFFER_SIZE], receive_buffer[BUFFER_SIZE];
   int n, bytes, addrlen;
   char portNum[NI_MAXSERV]; // NI_MAXSERV = 32
-  char username[80];
-  char passwd[80];
 
   memset(&send_buffer, 0, BUFFER_SIZE); // initialize buffer (Memset() , copies a single character for a specified number of times to an object )
   memset(&receive_buffer, 0, RBUFFER_SIZE); // initialize receive buffer
@@ -242,6 +240,8 @@ int main(int argc, char *argv[]) {
   // For wildcard IP address
   // setting the AI_PASSIVE flag indicates the caller intends to use the returned socket address structure in a call to the bind function.
   hints.ai_flags = AI_PASSIVE;
+
+  #define DEFAULT_PORT "1234"
 
   // Resolve the local address and port to be used by the server
   if (argc == 2) { // if we input port number
@@ -822,7 +822,7 @@ int main(int argc, char *argv[]) {
       }
     }
     //---
-    */
+    
       /*
 
       // technically, LIST is different than NLST,but we make them the same here
@@ -895,7 +895,7 @@ int main(int argc, char *argv[]) {
       //---
        */
       //=================================================================================
-    } // End of COMMUNICATION LOOP per CLIENT
+    //} // End of COMMUNICATION LOOP per CLIENT
     //=================================================================================
 
     //********************************************************************
@@ -905,7 +905,7 @@ int main(int argc, char *argv[]) {
 #if defined __unix__ || defined __APPLE__
     close(ns);
 #elif defined _WIN32
-    int iResult = shutdown(ns, SD_SEND);
+    iResult = shutdown(ns, SD_SEND);
     if (iResult == SOCKET_ERROR) {
       printf("shutdown failed with error: %d\n", WSAGetLastError());
       closesocket(ns);
