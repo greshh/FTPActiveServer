@@ -166,7 +166,25 @@ file_type = FileType::UNKNOWN;
 		 localaddr.sin_family = AF_INET;
          */
 
-         s = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP); // changed to Ipv6 and enforce  TCP Proto
+		 // set the socket address structure.
+		 struct addrinfo *result = NULL;
+		 struct addrinfo hints;
+		 int iResult;
+
+		 memset(&hints, 0, sizeof(struct addrinfo));
+
+		 if (USE_IPV6) {
+			 hints.ai_family = AF_INET6;
+		 } else { // IPV4
+			 hints.ai_family = AF_INET;
+		 }
+
+		 hints.ai_socktype = SOCK_STREAM;
+		 hints.ai_protocol = IPPROTO_TCP;
+
+		 char portNum[NI_MAXSERV];
+
+		 s = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP); // changed to Ipv6 and enforce  TCP Proto
 
          #if defined __unix__ || defined __APPLE__ // for cross planform
              if (s <0) {
@@ -189,10 +207,17 @@ file_type = FileType::UNKNOWN;
              // ipv4 only, needs replacing. In our lectures, we have an elegant way of resolving the local address and port to be used by the server.
              // (I don't know whatway he said so I just simplily change the code to Ipv6's one...... in the same style.... )
              localaddr.sin6_port = htons((u_short)atoi(argv[1]));
+
+			 iResult = getaddrinfo(NULL, argv[1], &hints, &result);
+			 sprintf(portNum, "%s", argv[1]);
+			 printf("\nargv[1] = %s\n", argv[1]);
 		 }
 		 else {
 			 //localaddr.sin_port = htons(1234);//default listening port //ipv4 only, needs replacing
              localaddr.sin6_port = htons(1234); // Default listening port
+
+			 iResult = getaddrinfo(NULL, "1234", &hints, &result); 
+			 sprintf(portNum, "%s", "1234");
 		 }
 		 //localaddr.sin_addr.s_addr = INADDR_ANY;//server address should be local, old programming style, needs replacing
          localaddr.sin6_addr = in6addr_any; // Bind to all available interfaces
@@ -200,10 +225,23 @@ file_type = FileType::UNKNOWN;
 //********************************************************************
 //BIND
 //********************************************************************
-		 if (bind(s,(struct sockaddr *)(&localaddr),sizeof(localaddr)) != 0) { //old programming style, needs replacing
-			 printf("Bind failed!\n");
-			 exit(0);
-		 }
+		 iResult = bind(s, result->ai_addr, (int)result->ai_addrlen);
+
+		 //if error is detected, then clean-up
+#if defined __unix__ || defined __APPLE__
+   if (iResult == -1) {
+      printf( "\nbind failed\n"); 
+      freeaddrinfo(result);
+      close(s);//close socket
+#elif defined _WIN32
+    if (iResult == SOCKET_ERROR) {
+      printf("bind failed with error: %d\n", WSAGetLastError());
+      freeaddrinfo(result);
+      closesocket(s);
+      WSACleanup();
+#endif       
+      exit(0);
+    }
 		 
 //********************************************************************
 //LISTEN
