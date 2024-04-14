@@ -16,19 +16,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
+<<<<<<< HEAD
       <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.exe" beforeDir="false" afterPath="$PROJECT_DIR$/server.exe" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server_REDO.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.txt" afterDir="false" />
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+<<<<<<< HEAD
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+=======
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -81,6 +92,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
@@ -98,6 +110,27 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+=======
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.overridden": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "last_opened_file_path": "C:/Users/any31/OneDrive/Massey/159342 Operating Systems and Networks/Assignment/159342 240412 A1/New folder/A1_FTP_startup_vscode_windows_v3",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1" />
@@ -106,7 +139,11 @@
       <recent name="C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1" />
     </key>
   </component>
+<<<<<<< HEAD
   <component name="RunManager" selected="Makefile Application.server.exe">
+=======
+  <component name="RunManager" selected="Makefile Application.all">
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
     <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="159342-Assignment-1" TARGET_NAME="server.cpp" CONFIG_NAME="server.cpp" version="1">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
@@ -134,6 +171,15 @@
       <workItem from="1712656897079" duration="608000" />
       <workItem from="1712684627033" duration="3234000" />
       <workItem from="1712691568821" duration="5452000" />
+<<<<<<< HEAD
+=======
+      <workItem from="1712730688751" duration="6354000" />
+      <workItem from="1712778270902" duration="6918000" />
+      <workItem from="1712832782717" duration="13458000" />
+      <workItem from="1712956504745" duration="22000" />
+      <workItem from="1712956640851" duration="5502000" />
+      <workItem from="1713041652519" duration="15634000" />
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
     </task>
     <servers />
   </component>
@@ -157,6 +203,7 @@
       </map>
     </option>
   </component>
+<<<<<<< HEAD
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -168,4 +215,6 @@
       </breakpoints>
     </breakpoint-manager>
   </component>
+=======
+>>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
 </project>
