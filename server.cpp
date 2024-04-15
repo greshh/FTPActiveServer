@@ -23,10 +23,9 @@
 // Author: n.h.reyes@massey.ac.nz
 //=======================================================================================================================
 
-/* #define USE_IPV6 false  //if set to false, IPv4 addressing scheme will be used;
- * you need to set this to true to enable IPv6 later on.
- * The assignment will be marked using IPv6!*/
-#define USE_IPV6 true // enable Ipv6
+//#define USE_IPV6 false  //if set to false, IPv4 addressing scheme will be used; you need to set this to true to enable IPv6 later on.  The assignment will be marked using IPv6!
+#define USE_IPV6 true  // enable Ipv6
+#define InetNtopA inet_ntop
 
 #if defined __unix__ || defined __APPLE__
 #include <arpa/inet.h>
@@ -63,7 +62,41 @@ enum class FileType { BINARY, TEXT, UNKNOWN };
 
 FileType file_type;
 
-#define DEFAULT_PORT "1234"
+
+
+
+// Reconnection after Error
+void reconnect(int& s, sockaddr_in6& localaddr){
+    //close the current socket(In Error)
+#if defined __unix__ || defined __APPLE__
+    close(s);
+#elif defined _WIN32
+    closesocket(s);
+#endif
+
+    // reconnected to a new socket
+    s = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+#if defined __unix__ || defined __APPLE__ // for cross planform
+    if (s <0) {
+         			 printf("socket failed\n");
+         		 }
+#elif defined _WIN32
+    //check for errors in socket allocation
+    if (s == INVALID_SOCKET) {
+        printf("Error at socket(): %d\n", WSAGetLastError());
+        //freeaddrinfo(result);
+        WSACleanup();
+        exit(1);//return 1;
+    }
+#endif
+
+    if (bind(s,(struct sockaddr *)(&localaddr),sizeof(localaddr)) != 0) { //old programming style, needs replacing
+        printf("Bind failed!\n");
+        exit(0);
+    }
+
+    listen(s, 5);
+}
 
 //********************************************************************
 // MAIN
@@ -148,8 +181,6 @@ int main(int argc, char *argv[]) {
   char send_buffer[BUFFER_SIZE], receive_buffer[BUFFER_SIZE];
   int n, bytes, addrlen;
   char portNum[NI_MAXSERV]; // NI_MAXSERV = 32
-  char username[80];
-  char passwd[80];
 
   memset(&send_buffer, 0, BUFFER_SIZE); // initialize buffer (Memset() , copies a single character for a specified number of times to an object )
   memset(&receive_buffer, 0, RBUFFER_SIZE); // initialize receive buffer
@@ -209,6 +240,8 @@ int main(int argc, char *argv[]) {
   // For wildcard IP address
   // setting the AI_PASSIVE flag indicates the caller intends to use the returned socket address structure in a call to the bind function.
   hints.ai_flags = AI_PASSIVE;
+
+  #define DEFAULT_PORT "1234"
 
   // Resolve the local address and port to be used by the server
   if (argc == 2) { // if we input port number
@@ -734,36 +767,40 @@ int main(int argc, char *argv[]) {
       count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0],
                        act_ip[1], act_ip[2], act_ip[3]);
 
-      if (!(count >= 0 && count < BUFFER_SIZE))
-        break;
+					 if(!(count >=0 && count < BUFFER_SIZE)) break;
 
-      printf("\tCLIENT's IP is %s\n", ip_decimal); // IPv4 format
-      local_data_addr_act.sin_addr.s_addr =
-          inet_addr(ip_decimal); // ipv4 only, needs to be replaced.
-      port_dec = act_port[0];
-      port_dec = port_dec << 8;
-      port_dec = port_dec + act_port[1];
-      printf("\tCLIENT's Port is %d\n", port_dec);
-      printf("===================================================\n");
+                     /*
+					 printf("\tCLIENT's IP is %s\n",ip_decimal);  //IPv4 format
+					 local_data_addr_act.sin_addr.s_addr=inet_addr(ip_decimal);  //ipv4 only, needs to be replaced.
+					 port_dec=act_port[0];
+					 port_dec=port_dec << 8;
+					 port_dec=port_dec+act_port[1];
+					 printf("\tCLIENT's Port is %d\n",port_dec);
+					 printf("===================================================\n");
+					 
+					 local_data_addr_act.sin_port=htons(port_dec); //ipv4 only, needs to be replaced
+                      */
 
-      local_data_addr_act.sin_port =
-          htons(port_dec); // ipv4 only, needs to be replaced
+                     // Print the client's IP address (IPv6 format)
+                     char ip_buffer[INET6_ADDRSTRLEN]; // Buffer to hold the IPv6 address string
+                     inet_ntop(AF_INET6, &local_data_addr_act.sin6_addr, ip_buffer, INET6_ADDRSTRLEN);
+                     printf("connected to [CLIENT's IP %s , port %d] through SERVER's port %d\n",
+                            ip_buffer, ntohs(remoteaddr.sin6_port), ntohs(localaddr.sin6_port));
+                     printf("===================================================\n");
+                     local_data_addr_act.sin6_port=htons(port_dec);
 
-      // Note: the following connect() function is not correctly placed.  It
-      // works, but technically, as defined by
-      //  the protocol, connect() should occur in another place.  Hint:
-      //  carefully inspect the lecture on FTP, active operations to find the
-      //  answer.
-      if (connect(s_data_act, (struct sockaddr *)&local_data_addr_act,
-                  (int)sizeof(struct sockaddr)) != 0) {
-        printf("trying connection in %s %d\n",
-               inet_ntoa(local_data_addr_act.sin_addr),
-               ntohs(local_data_addr_act.sin_port));
-        count = snprintf(
-            send_buffer, BUFFER_SIZE,
-            "425 Something is wrong, can't start active connection... \r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+
+           // Note: the following connect() function is not correctly placed.  It works, but technically, as defined by
+           // the protocol, connect() should occur in another place.  Hint: carefully inspect the lecture on FTP, active operations 
+           // to find the answer. 
+					 if (connect(s_data_act, (struct sockaddr *)&local_data_addr_act, (int) sizeof(struct sockaddr)) != 0){
+						 //printf("trying connection in %s %d\n",inet_ntoa(local_data_addr_act.sin_addr),ntohs(local_data_addr_act.sin_port));
+                         printf("trying connection in %s %d\n",
+                                inet_ntop(AF_INET6, &local_data_addr_act.sin6_addr, ip_buffer, INET6_ADDRSTRLEN),
+                                ntohs(local_data_addr_act.sin6_port));
+                         count=snprintf(send_buffer,BUFFER_SIZE, "425 Something is wrong, can't start active connection... \r\n");
+						 if(count >=0 && count < BUFFER_SIZE){
+						   bytes = send(ns, send_buffer, strlen(send_buffer), 0);
 
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
         }
@@ -785,7 +822,7 @@ int main(int argc, char *argv[]) {
       }
     }
     //---
-    */
+    
       /*
 
       // technically, LIST is different than NLST,but we make them the same here
@@ -858,7 +895,7 @@ int main(int argc, char *argv[]) {
       //---
        */
       //=================================================================================
-    } // End of COMMUNICATION LOOP per CLIENT
+    //} // End of COMMUNICATION LOOP per CLIENT
     //=================================================================================
 
     //********************************************************************
@@ -868,7 +905,7 @@ int main(int argc, char *argv[]) {
 #if defined __unix__ || defined __APPLE__
     close(ns);
 #elif defined _WIN32
-    int iResult = shutdown(ns, SD_SEND);
+    iResult = shutdown(ns, SD_SEND);
     if (iResult == SOCKET_ERROR) {
       printf("shutdown failed with error: %d\n", WSAGetLastError());
       closesocket(ns);
@@ -877,15 +914,15 @@ int main(int argc, char *argv[]) {
     }
     closesocket(ns);
 #endif
-    // printf("DISCONNECTED from %s\n",inet_ntoa(remoteaddr.sin_addr)); //IPv4 only, needs replacing
-    printf("DISCONNECTED from %s\n",
-           inet_ntop(AF_INET6, &clientAddress, send_buffer,sizeof(send_buffer)));
+			//printf("DISCONNECTED from %s\n",inet_ntoa(remoteaddr.sin_addr)); //IPv4 only, needs replacing
+            printf("DISCONNECTED from %s\n",inet_ntop(AF_INET6, &remoteaddr.sin6_addr, send_buffer, sizeof(send_buffer)));
 
-    //====================================================================================
-  } // End of MAIN LOOP
-  //====================================================================================
-
-  printf("\nSERVER SHUTTING DOWN...\n");
+			 
+		 //====================================================================================
+		 } //End of MAIN LOOP
+		 //====================================================================================
+		 
+		  printf("\nSERVER SHUTTING DOWN...\n");
 
 #if defined __unix__ || defined __APPLE__
   close(s); //close listening socket
