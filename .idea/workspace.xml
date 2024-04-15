@@ -16,30 +16,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
-      <<<<<<< HEAD
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/159342-Assignment-1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.exe" beforeDir="false" afterPath="$PROJECT_DIR$/server.exe" afterDir="false" />
-      =======
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_REDO.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.txt" afterDir="false" />
-      >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <<<<<<< HEAD
-  <component name="ClangdSettings">
-    <option name="formatViaClangd" value="false" />
-  </component>
-  =======
-  >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -47,33 +36,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="MakefileLocalSettings">
-    <option name="availableProjects">
-      <map>
-        <entry>
-          <key>
-            <ExternalProjectPojo>
-              <option name="name" value="159342-Assignment-1" />
-              <option name="path" value="$PROJECT_DIR$" />
-            </ExternalProjectPojo>
-          </key>
-          <value>
-            <list>
-              <ExternalProjectPojo>
-                <option name="name" value="159342-Assignment-1" />
-                <option name="path" value="$PROJECT_DIR$" />
-              </ExternalProjectPojo>
-            </list>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="projectSyncType">
-      <map>
-        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
-      </map>
-    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -92,45 +54,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <<<<<<< HEAD
   <component name="PropertiesComponent">{
-    &quot;keyToString&quot;: {
+  &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.overridden&quot;: &quot;true&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/any31/OneDrive/Massey/159342 Operating Systems and Networks/Assignment/159342 240412 A1/159342-Assignment-1&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/any31/OneDrive/Massey/159342 Operating Systems and Networks/Assignment/159342 240412 A1/New folder/A1_FTP_startup_vscode_windows_v3&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-    }
-    }</component>
-  =======
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.advertisement.text.overridden": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "C:/Users/any31/OneDrive/Massey/159342 Operating Systems and Networks/Assignment/159342 240412 A1/New folder/A1_FTP_startup_vscode_windows_v3",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "vue.rearranger.settings.migration": "true"
   }
-}]]></component>
-  >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1" />
@@ -139,11 +82,7 @@
       <recent name="C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1" />
     </key>
   </component>
-  <<<<<<< HEAD
-  <component name="RunManager" selected="Makefile Application.server.exe">
-  =======
   <component name="RunManager" selected="Makefile Application.all">
-    >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
     <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="159342-Assignment-1" TARGET_NAME="server.cpp" CONFIG_NAME="server.cpp" version="1">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
@@ -171,15 +110,10 @@
       <workItem from="1712656897079" duration="608000" />
       <workItem from="1712684627033" duration="3234000" />
       <workItem from="1712691568821" duration="5452000" />
-      <<<<<<< HEAD
-      =======
-      <workItem from="1712730688751" duration="6354000" />
-      <workItem from="1712778270902" duration="6918000" />
-      <workItem from="1712832782717" duration="13458000" />
-      <workItem from="1712956504745" duration="22000" />
-      <workItem from="1712956640851" duration="5502000" />
-      <workItem from="1713041652519" duration="15634000" />
-      >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
+      <workItem from="1713041652519" duration="30176000" />
+      <workItem from="1713125673973" duration="81000" />
+      <workItem from="1713129468297" duration="1536000" />
+      <workItem from="1713134555632" duration="25097000" />
     </task>
     <servers />
   </component>
@@ -203,18 +137,7 @@
       </map>
     </option>
   </component>
-  <<<<<<< HEAD
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/server.cpp</url>
-          <line>84</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+  <component name="VcsManagerConfiguration">
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
-  =======
-  >>>>>>> a6a66b94c6048c12dda1bc5f86e78c7d987f647d
 </project>
