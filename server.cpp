@@ -1,4 +1,3 @@
-
 //=======================================================================================================================
 // Course: 159.342
 // Description: Cross-platform, Active mode FTP SERVER, Start-up Code for
@@ -55,8 +54,7 @@ FileType file_type;
 
 #define DEFAULT_PORT "1234"
 
-// debug use//
-
+/*/ DEBUGS USE //
 void printClientAddress(struct sockaddr_storage *clientAddress) {
   char clientIP[INET6_ADDRSTRLEN];
   int clientPort;
@@ -81,6 +79,7 @@ void printClientAddress(struct sockaddr_storage *clientAddress) {
   printf("Client Port: %d\n", clientPort);
   printf("Client AF: %d\n", clientAddress->ss_family);
 }
+// DEBUGS USE /*/
 
 //********************************************************************
 // MAIN
@@ -109,14 +108,13 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  printf("\n\n<<<TCP (CROSS-PLATFORM, IPv6-ready) SERVER, by nhreyes>>>\n");
   if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2) {
     // Tell the user that we could not find a usable WinSock DLL.
     printf("Could not find a usable version of Winsock.dll\n");
     WSACleanup();
     exit(1);
   } else {
-    printf("\nThe Winsock 2.2 dll was initialised.\n");
+    //printf("\nThe Winsock 2.2 dll was initialised.\n");
   }
 
 #endif
@@ -127,7 +125,6 @@ int main(int argc, char *argv[]) {
       clientAddress_act; // IPV6-compatible - address information
   memset(&clientAddress_act, 0, sizeof(clientAddress_act));
 
-  // struct sockaddr_in6 clientAddress_act_Ipv6; // IPV6 - EPRT
   struct sockaddr_in clientAddress_act_Ipv4; // IPv4 - PORT
   socklen_t addr_len;
 
@@ -156,13 +153,10 @@ int main(int argc, char *argv[]) {
   char send_buffer[BUFFER_SIZE], receive_buffer[BUFFER_SIZE];
   int n, bytes, addrlen;
   char portNum[NI_MAXSERV]; // NI_MAXSERV = 32
-  // char username[80];
-  // char passwd[80];
 
   memset(
       &send_buffer, 0,
-      BUFFER_SIZE); // initialize buffer (Memset() , copies a single character
-                    // for a specified number of times to an object )
+      BUFFER_SIZE); // initialize buffer (Memset() , copies a single character for a specified number of times to an object )
   memset(&receive_buffer, 0, RBUFFER_SIZE); // initialize receive buffer
 
 #if defined __unix__ || defined __APPLE__
@@ -191,10 +185,14 @@ int main(int argc, char *argv[]) {
 
   if (USE_IPV6) {
     hints.ai_family = AF_INET6;
+    /*/ DEBUGS USE //
     printf("\nDEBUG: Using Ipv6 addresses and socket.\n");
+    // DEBUGS USE /*/
   } else { // IPV4
     hints.ai_family = AF_INET;
+    /*/ DEBUGS USE //
     printf("\nDEBUG: Using Ipv4 addresses and socket.\n");
+    // DEBUGS USE /*/
   }
 
   hints.ai_socktype = SOCK_STREAM; // for TCP
@@ -214,7 +212,6 @@ int main(int argc, char *argv[]) {
 
     iResult = getaddrinfo(NULL, argv[1], &hints, &result);
     sprintf(portNum, "%s", argv[1]);
-    printf("\nargv[1] = %s\n", argv[1]);
 
   } else { // use default port 1234
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
@@ -245,7 +242,7 @@ int main(int argc, char *argv[]) {
 
   s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
-#if defined __unix__ || defined __APPLE__ // for cross platform
+#if defined __unix__ || defined __APPLE__ // for crossplatform
   if (s < 0) {
     printf("socket failed\n");
     freeaddrinfo(result);
@@ -283,8 +280,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  freeaddrinfo(result); // free the memory allocated by the getaddrinfo function
-                        // for the server's address, as it is no longer needed
+  freeaddrinfo(result); // free the memory allocated by the getaddrinfo function for the server's address, as it is no longer needed
 
   //********************************************************************
   // LISTEN
@@ -319,12 +315,10 @@ int main(int argc, char *argv[]) {
     //********************************************************************
     // NEW SOCKET newsocket = accept  //CONTROL CONNECTION
     //********************************************************************
-    printf("\n-----------------------------------------------------------------"
-           "-------\n");
+    printf("\n------------------------------------------------------------------------\n");
     printf("SERVER is waiting for an incoming connection request at port:%s",
            portNum);
-    printf("\n-----------------------------------------------------------------"
-           "-------\n");
+    printf("\n------------------------------------------------------------------------\n");
 
 #if defined __unix__ || defined __APPLE__
     ns = accept(s, (struct sockaddr *)(&clientAddress),
@@ -333,8 +327,6 @@ int main(int argc, char *argv[]) {
     ns = accept(s, (struct sockaddr *)(&clientAddress),
                 &addrlen); // IPV4 & IPV6-compliant
 #endif
-
-    // if (ns < 0 ) break;
 
 #if defined __unix__ || defined __APPLE__
     if (ns == -1) {
@@ -486,13 +478,11 @@ int main(int argc, char *argv[]) {
           i++;
         }
         printf("%s\n", password);
-        // we are only allowing one user to log in successfully, as per the
-        // details below:
+        // we are only allowing one user to log in successfully, as per the details below:
         char user[] = "napoleon";
         char pass[] = "342";
         if (strcmp(username, user) == 0 &&
-            strcmp(password, pass) == 0) { // both username and password have to
-                                           // be correct in order to sign in.
+            strcmp(password, pass) == 0) { // both username and password have to be correct in order to sign in.
           count = snprintf(send_buffer, BUFFER_SIZE,
                            "230 Public login sucessful \r\n");
         } else {
@@ -694,7 +684,6 @@ int main(int argc, char *argv[]) {
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          // printf("Connected to client\n");
         }
       }
       //---
@@ -706,16 +695,13 @@ int main(int argc, char *argv[]) {
         int af; // Address Family
         int port;
         char ip_address[INET6_ADDRSTRLEN]; // For IPv6
-        active = 1;
+        active = 1; // active mode
 
-        // Parse the EPRT command (pattern: EPRT |protocol|ip|port| , protocol:
-        // 1= Ipv4, 2 = Ipv6)
-        int scannedItems = sscanf(receive_buffer, "EPRT |%d|%[^|]|%d|", &af,
-                                  ip_address, &port);
+        // Parse the EPRT command (pattern: EPRT |protocol|ip|port| , protocol: 1= Ipv4, 2 = Ipv6)
+        int scannedItems = sscanf(receive_buffer, "EPRT |%d|%[^|]|%d|", &af, ip_address, &port);
 
         if (scannedItems < 3 ||
-            (af != 1 && af != 2)) { // scannedItems < 3 => not enough parameter,
-                                    // af !=1 or !=2 => wrong protocol
+            (af != 1 && af != 2)) { // scannedItems < 3 => not enough parameter, af !=1 or !=2 => wrong protocol
           count = snprintf(send_buffer, BUFFER_SIZE,
                            "501 Syntax error in arguments\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
@@ -725,14 +711,12 @@ int main(int argc, char *argv[]) {
           if (bytes < 0)
             break;
         } else {
-          // store data to clientAddress_act
-          // socklen_t addr_len;
           if (af == 1) { // IPv4
             struct sockaddr_in *clientAddress_act_ipv4 =
                 (struct sockaddr_in *)&clientAddress_act;
             clientAddress_act_ipv4->sin_family = AF_INET;
             clientAddress_act_ipv4->sin_port = htons(port);
-            /// debug use //
+            /*/ DEBUGS USE //
             printf("IPv4 Address:\n");
             printf("\tFamily: %d\n", clientAddress_act_ipv4->sin_family);
             printf("\tPort: %d\n", ntohs(clientAddress_act_ipv4->sin_port));
@@ -740,7 +724,7 @@ int main(int argc, char *argv[]) {
             inet_ntop(AF_INET, &(clientAddress_act_ipv4->sin_addr), ipv4_str,
                       INET_ADDRSTRLEN);
             printf("\tIP Address: %s\n", ipv4_str);
-            //
+            // DEBUGS USE /*/
 
             inet_pton(AF_INET, ip_address, &(clientAddress_act_ipv4->sin_addr));
             addr_len = sizeof(struct sockaddr_in);
@@ -749,14 +733,14 @@ int main(int argc, char *argv[]) {
                 (struct sockaddr_in6 *)&clientAddress_act;
             clientAddress_act_ipv6->sin6_port = htons(port);
             clientAddress_act_ipv6->sin6_family = AF_INET6;
-            /// debug use //
+            /*/ DEBUGS USE //
             printf("IPv6 Address:\n");
             printf("\tFamily: %d (hex: 0x%x)\n",
                    clientAddress_act_ipv6->sin6_family,
                    clientAddress_act_ipv6->sin6_family);
             printf("\tPort: %d\n", ntohs(clientAddress_act_ipv6->sin6_port));
             char ipv6_str[INET6_ADDRSTRLEN];
-            //
+            // DEBUGS USE /*/
             inet_pton(AF_INET6, ip_address,
                       &(clientAddress_act_ipv6->sin6_addr));
             if (inet_pton(AF_INET6, ip_address,
@@ -766,13 +750,14 @@ int main(int argc, char *argv[]) {
             addr_len = sizeof(struct sockaddr_in6);
           }
           // Send success response
+          /*/ DEBUGS USE //
           printClientAddress(&clientAddress_act);
+          // DEBUGS USE /*/
           count = snprintf(send_buffer, BUFFER_SIZE,
                            "200 EPRT Command successful\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
             printf("[DEBUG INFO] <-- %s\n", send_buffer);
-            // printf("Connected to client\n");
           }
           if (bytes < 0)
             break;
@@ -786,9 +771,6 @@ int main(int argc, char *argv[]) {
         printf("===================================================\n");
         printf("\tOpening data socket..... \n");
 
-//        printf("Client address information:\n");
-//        printClientAddress(&clientAddress_act);
-
         // =======
 
         s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
@@ -799,8 +781,7 @@ int main(int argc, char *argv[]) {
           #endif
           return 1;
         }
-        iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act,
-                          sizeof(clientAddress_act));
+        iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act, sizeof(clientAddress_act));
         if (iResult != 0) {
           count = snprintf(
               send_buffer, BUFFER_SIZE,
@@ -844,10 +825,14 @@ int main(int argc, char *argv[]) {
             if (count >= 0 && count < BUFFER_SIZE) {
               if (active == 0){
                 send(ns_data, send_buffer, strlen(send_buffer), 0);
+                /*/ DEBUGS USE //
                 printf("Sending w/ns_data: %s", send_buffer);
+                // DEBUGS USE /*/
               } else {
                 send(s_data_act, send_buffer, strlen(send_buffer), 0);
+                /*/ DEBUGS USE //
                 printf("Sending w/ns_data_act: %s", send_buffer);
+                // DEBUGS USE /*/
               }
             }
           }
@@ -874,7 +859,7 @@ int main(int argc, char *argv[]) {
         }
       }
         // OPTIONAL, delete the temporary file
-        // system("del tmp.txt");
+        system("del tmp.txt");
 
       //---
       //=================================================================================
@@ -888,7 +873,7 @@ int main(int argc, char *argv[]) {
 #if defined __unix__ || defined __APPLE__
     close(ns);
 #elif defined _WIN32
-    int iResult = shutdown(ns, SD_SEND);
+    iResult = shutdown(ns, SD_SEND);
     if (iResult == SOCKET_ERROR) {
       printf("shutdown failed with error: %d\n", WSAGetLastError());
       closesocket(ns);
