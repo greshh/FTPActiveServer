@@ -624,6 +624,11 @@ int main(int argc, char *argv[]) {
             }
             ifstream retr_file(filename, ios::binary);
             if (!retr_file.is_open()) {
+              #if defined __unix__ || defined __APPLE__
+                close(s_data_act);
+              #elif defined _WIN32
+                closesocket(s_data_act);
+              #endif
               count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
