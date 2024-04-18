@@ -18,7 +18,6 @@
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,11 +112,19 @@
       <workItem from="1713174226739" duration="17007000" />
       <workItem from="1713212473181" duration="9537000" />
       <workItem from="1713257491110" duration="988000" />
+      <workItem from="1713364941364" duration="643000" />
+      <workItem from="1713365659754" duration="2000" />
+      <workItem from="1713365675906" duration="28000" />
+      <workItem from="1713365717464" duration="487000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
   </component>
   <component name="VCPKGProject">
     <isAutomaticEditVcpkgJson value="false" />
