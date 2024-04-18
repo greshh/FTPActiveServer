@@ -609,11 +609,11 @@ int main(int argc, char *argv[]) {
           s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
           if (connect(s_data_act, (struct sockaddr *)&clientAddress_act, addr_len) != 0) {
             printf("Error connecting to client\n");
-            #if defined __unix__ || defined __APPLE__
-              close(s_data_act);
-            #elif defined _WIN32
-              closesocket(s_data_act);
-            #endif
+#if defined __unix__ || defined __APPLE__
+            close(s_data_act);
+#elif defined _WIN32
+            closesocket(s_data_act);
+#endif
           } else {
             char filename[BUFFER_SIZE];
             memset(filename, '\0', sizeof(filename));
@@ -624,6 +624,11 @@ int main(int argc, char *argv[]) {
             }
             ifstream retr_file(filename, ios::binary);
             if (!retr_file.is_open()) {
+#if defined __unix__ || defined __APPLE__
+              close(s_data_act);
+#elif defined _WIN32
+              closesocket(s_data_act);
+#endif
               count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
@@ -639,18 +644,18 @@ int main(int argc, char *argv[]) {
                 send(s_data_act, buffer, bytes_read, 0);
               }
               retr_file.close();
-              #if defined __unix__ || defined __APPLE__
-                close(s_data_act);
-              #elif defined _WIN32
-                closesocket(s_data_act);
-              #endif
+#if defined __unix__ || defined __APPLE__
+              close(s_data_act);
+#elif defined _WIN32
+              closesocket(s_data_act);
+#endif
               count = snprintf(send_buffer, BUFFER_SIZE, "226 File transfer complete. \r\n");
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
                 printf("[DEBUG INFO] <-- %s\n", send_buffer);
               }
               if (bytes < 0)
-                 break;
+                break;
             }
           }
         }
@@ -845,64 +850,9 @@ int main(int argc, char *argv[]) {
         s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
         if (s_data_act == INVALID_SOCKET) {
           printf("Error at socket(): %d\n", WSAGetLastError());
-          #if defined _WIN32
-           WSACleanup();
-          #endif
-          return 1;
-        }
-        iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act, sizeof(clientAddress_act));
-        if (iResult != 0) {
-          count = snprintf(
-              send_buffer, BUFFER_SIZE,
-              "425 Something is wrong, can't start active connection... \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-            printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          }
-          printf("Error connecting to client\n");
-          #if defined __unix__ || defined __APPLE__
-            close(s_data_act);
-          #elif defined _WIN32
-            closesocket(s_data_act);
-          #endif
-          break;
-        } else {
-          printf("Connected to client\n");
-          count = snprintf( send_buffer, BUFFER_SIZE, "150 opening ASCII mode data connection\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-            printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          }
-        }
-        #if defined __unix__ || defined __APPLE__
-         int i = system("ls -la > tmp.txt"); // save list to a txt file, return
-                                            // 0 if success
-        #elif defined _WIN32
-          int i = system("dir > tmp.txt"); // save list to a txt file, return 0 if success
-        #endif
-        printf("The value returned by system() was: %d.\n", i);
-
-        FILE *fin;
-
-        fin = fopen("tmp.txt", "r"); // open tmp.txt file in read mode
-        char temp_buffer[500];
-        printf("transferring file...\n");
-        while (!feof(fin)) {
-          strcpy(temp_buffer, "");
-          if (fgets(temp_buffer, 498, fin) != NULL) {
-            count = snprintf(send_buffer, BUFFER_SIZE, "%s", temp_buffer);
-            if (count >= 0 && count < BUFFER_SIZE) {
-              if (active == 0){
-                send(ns_data, send_buffer, strlen(send_buffer), 0);
-                /*/ DEBUGS USE //
-                printf("Sending w/ns_data: %s", send_buffer);
-                // DEBUGS USE /*/
-              } else {
-                send(s_data_act, send_buffer, strlen(send_buffer), 0);
-                /*/ DEBUGS USE //
-                printf("Sending w/ns_data_act: %s", send_buffer);
-                // DEBUGS USE /*/
-              }
+#if defined _WIN32
+          WSACleanup();
+#endif
         } else {
           iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act, sizeof(clientAddress_act));
           if (iResult != 0) {
@@ -914,11 +864,11 @@ int main(int argc, char *argv[]) {
               printf("[DEBUG INFO] <-- %s\n", send_buffer);
             }
             printf("Error connecting to client\n");
-            #if defined __unix__ || defined __APPLE__
-              close(s_data_act);
-            #elif defined _WIN32
-              closesocket(s_data_act);
-            #endif
+#if defined __unix__ || defined __APPLE__
+            close(s_data_act);
+#elif defined _WIN32
+            closesocket(s_data_act);
+#endif
             break;
           } else {
             printf("Connected to client\n");
@@ -926,11 +876,64 @@ int main(int argc, char *argv[]) {
             if (count >= 0 && count < BUFFER_SIZE) {
               bytes = send(ns, send_buffer, strlen(send_buffer), 0);
               printf("[DEBUG INFO] <-- %s\n", send_buffer);
+            }
+          }
+#if defined __unix__ || defined __APPLE__
+          int i = system("ls -la > tmp.txt"); // save list to a txt file, return
+                                              // 0 if success
+#elif defined _WIN32
+          int i = system("dir > tmp.txt"); // save list to a txt file, return 0 if success
+#endif
+          printf("The value returned by system() was: %d.\n", i);
+
+          FILE *fin;
+
+          fin = fopen("tmp.txt", "r"); // open tmp.txt file in read mode
+          char temp_buffer[500];
+          printf("transferring file...\n");
+          while (!feof(fin)) {
+            strcpy(temp_buffer, "");
+            if (fgets(temp_buffer, 498, fin) != NULL) {
+              count = snprintf(send_buffer, BUFFER_SIZE, "%s", temp_buffer);
+              if (count >= 0 && count < BUFFER_SIZE) {
+                if (active == 0){
+                  send(ns_data, send_buffer, strlen(send_buffer), 0);
+                  /*/ DEBUGS USE //
+                  printf("Sending w/ns_data: %s", send_buffer);
+                  // DEBUGS USE /*/
+                } else {
+                  send(s_data_act, send_buffer, strlen(send_buffer), 0);
+                  /*/ DEBUGS USE //
+                  printf("Sending w/ns_data_act: %s", send_buffer);
+                  // DEBUGS USE /*/
+                }
+              }
+            }
+          }
+
+          fclose(fin);
+#if defined __unix__ || defined __APPLE__
+          if (active == 0)
+            close(ns_data);
+          else
+            close(s_data_act);
+
+#elif defined _WIN32
+          if (active == 0)
+            closesocket(ns_data);
+          else
+            closesocket(s_data_act);
+#endif
+          count = snprintf(send_buffer, BUFFER_SIZE,
+                           "226 File transfer complete. \r\n");
+          if (count >= 0 && count < BUFFER_SIZE) {
+            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+            printf("[DEBUG INFO] <-- %s\n", send_buffer);
           }
         }
       }
-        // OPTIONAL, delete the temporary file
-        system("del tmp.txt");
+      // OPTIONAL, delete the temporary file
+      system("del tmp.txt");
 
       //---
       //=================================================================================
@@ -971,7 +974,4 @@ int main(int argc, char *argv[]) {
   WSACleanup();   // call WSACleanup when done using the Winsock dll
 #endif
   return 0;
-      }
-    }
-  }
 }
