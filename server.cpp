@@ -39,7 +39,7 @@
 #elif defined __WIN32__
 #include <iostream>
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string>
 #include <winsock2.h>
 #include <ws2tcpip.h> //required by getaddrinfo() and special constants
@@ -57,33 +57,6 @@ enum class FileType { BINARY, TEXT, UNKNOWN };
 FileType file_type;
 
 #define DEFAULT_PORT "1234"
-
-/*/ DEBUGS USE //
-void printClientAddress(struct sockaddr_storage *clientAddress) {
-  char clientIP[INET6_ADDRSTRLEN];
-  int clientPort;
-
-  if (clientAddress->ss_family == AF_INET) {
-    struct sockaddr_in *clientAddressIPv4 = (struct sockaddr_in *)clientAddress;
-    inet_ntop(AF_INET, &(clientAddressIPv4->sin_addr), clientIP,
-              INET_ADDRSTRLEN);
-    clientPort = ntohs(clientAddressIPv4->sin_port);
-  } else if (clientAddress->ss_family == AF_INET6) {
-    struct sockaddr_in6 *clientAddressIPv6 =
-        (struct sockaddr_in6 *)clientAddress;
-    inet_ntop(AF_INET6, &(clientAddressIPv6->sin6_addr), clientIP,
-              INET6_ADDRSTRLEN);
-    clientPort = ntohs(clientAddressIPv6->sin6_port);
-  } else {
-    printf("Unknown address family\n");
-    return;
-  }
-
-  printf("Client IP: %s\n", clientIP);
-  printf("Client Port: %d\n", clientPort);
-  printf("Client AF: %d\n", clientAddress->ss_family);
-}
-// DEBUGS USE /*/
 
 //********************************************************************
 // MAIN
@@ -107,18 +80,14 @@ int main(int argc, char *argv[]) {
 
   if (err != 0) {
     WSACleanup();
-    // Tell the user that we could not find a usable WinsockDLL
     printf("WSAStartup failed with error: %d\n", err);
     exit(1);
   }
 
   if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2) {
-    // Tell the user that we could not find a usable WinSock DLL.
     printf("Could not find a usable version of Winsock.dll\n");
     WSACleanup();
     exit(1);
-  } else {
-    //printf("\nThe Winsock 2.2 dll was initialised.\n");
   }
 
 #endif
@@ -139,16 +108,15 @@ int main(int argc, char *argv[]) {
   // set the socket address structure.
   //********************************************************************
   struct addrinfo *result = NULL; // initialize for using getaddrinfo()
-  struct addrinfo hints;          // Ipv4 (hints.ai_family > AF_INET) or Ipv6
-                                  // (hints.ai_family > AF_INET6)
-  int iResult;                    // result of getaddrinfo()
+  struct addrinfo hints;
+  int iResult;  // result of getaddrinfo()
 
 #if defined __unix__ || defined __APPLE__
   int s, ns;               // socket declaration
   int ns_data, s_data_act; // socket declaration
 #elif defined _WIN32
   SOCKET s, ns;               // socket declaration
-  SOCKET ns_data, s_data_act; // socket declaration
+  SOCKET ns_data, s_data_act; // data socket declaration
 #endif
 
 #define BUFFER_SIZE 500
@@ -160,7 +128,7 @@ int main(int argc, char *argv[]) {
 
   memset(
       &send_buffer, 0,
-      BUFFER_SIZE); // initialize buffer (Memset() , copies a single character for a specified number of times to an object )
+      BUFFER_SIZE); // initialize buffer
   memset(&receive_buffer, 0, RBUFFER_SIZE); // initialize receive buffer
 
 #if defined __unix__ || defined __APPLE__
@@ -181,43 +149,25 @@ int main(int argc, char *argv[]) {
   //********************************************************************
   // SOCKET
   //********************************************************************
-  //********
-  // STEP#0 - Specify server address information and socket properties
-  //********
 
   memset(&hints, 0, sizeof(struct addrinfo)); // initialize address info
 
   if (USE_IPV6) {
     hints.ai_family = AF_INET6;
-    /*/ DEBUGS USE //
-    printf("\nDEBUG: Using Ipv6 addresses and socket.\n");
-    // DEBUGS USE /*/
   } else { // IPV4
     hints.ai_family = AF_INET;
-    /*/ DEBUGS USE //
-    printf("\nDEBUG: Using Ipv4 addresses and socket.\n");
-    // DEBUGS USE /*/
   }
 
   hints.ai_socktype = SOCK_STREAM; // for TCP
   hints.ai_protocol = IPPROTO_TCP;
-  // For wildcard IP address
-  // setting the AI_PASSIVE flag indicates the caller intends to use the
-  // returned socket address structure in a call to the bind function. Ipv4 >
-  // INADDR_ANY (0.0.0.0) Ipv6 > IN6ADDR_ANY_INIT (::)
   hints.ai_flags = AI_PASSIVE;
 
   // Resolve the local address and port to be used by the server
   if (argc == 2) { // if we input port number
-
-    /* converts human-readable text strings representing hostnames or IP
-     * addresses into a dynamically allocated linked list of struct addrinfo
-     * structures IPV4 & IPV6-compliant */
-
     iResult = getaddrinfo(NULL, argv[1], &hints, &result);
     sprintf(portNum, "%s", argv[1]);
 
-  } else { // use default port 1234
+  } else { //use default port 1234
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
     sprintf(portNum, "%s", DEFAULT_PORT);
     printf("\nUsing DEFAULT_PORT = %s\n", portNum);
@@ -232,21 +182,16 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  //********
-  // STEP#1 - Create welcome SOCKET
-  //********
-
 #if defined __unix__ || defined __APPLE__
   s = -1;
 #elif defined _WIN32
   s = INVALID_SOCKET;
 #endif
 
-  // Create a SOCKET for the server to listen for client connections
-
+  // SOCKET for the server to listen for client connections
   s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
-#if defined __unix__ || defined __APPLE__ // for crossplatform
+#if defined __unix__ || defined __APPLE__
   if (s < 0) {
     printf("socket failed\n");
     freeaddrinfo(result);
@@ -262,10 +207,8 @@ int main(int argc, char *argv[]) {
 #endif
 
   //********************************************************************
-  // BIND (STEP#2 - BIND the welcome socket)
+  // BIND
   //********************************************************************
-  // bind the TCP welcome socket to the local address of the machine and port
-  // number
   iResult = bind(s, result->ai_addr, (int)result->ai_addrlen);
 
 // if error is detected, then clean-up
@@ -289,7 +232,6 @@ int main(int argc, char *argv[]) {
   //********************************************************************
   // LISTEN
   //********************************************************************
-  // listen(s, 5);
 #if defined __unix__ || defined __APPLE__
   if (listen(s, SOMAXCONN) == -1) {
 #elif defined _WIN32
@@ -316,20 +258,16 @@ int main(int argc, char *argv[]) {
   while (1) { // Start of MAIN LOOP
     //====================================================================================
     addrlen = sizeof(clientAddress); // IPv4 & IPv6-compliant
-    //********************************************************************
-    // NEW SOCKET newsocket = accept  //CONTROL CONNECTION
-    //********************************************************************
+
     printf("\n------------------------------------------------------------------------\n");
-    printf("SERVER is waiting for an incoming connection request at port:%s",
-           portNum);
+    printf("SERVER is waiting for an incoming connection request at port:%s", portNum);
     printf("\n------------------------------------------------------------------------\n");
 
 #if defined __unix__ || defined __APPLE__
     ns = accept(s, (struct sockaddr *)(&clientAddress),
-                (socklen_t *)&addrlen); // IPV4 & IPV6-compliant
+                (socklen_t *)&addrlen);
 #elif defined _WIN32
-    ns = accept(s, (struct sockaddr *)(&clientAddress),
-                &addrlen); // IPV4 & IPV6-compliant
+    ns = accept(s, (struct sockaddr *)(&clientAddress), &addrlen);
 #endif
 
 #if defined __unix__ || defined __APPLE__
@@ -351,13 +289,11 @@ int main(int argc, char *argv[]) {
         printf("\nError detected: getnameinfo() failed \n");
         exit(1);
       } else {
-        printf("\n============================================================="
-               "===============\n");
+        printf("\n============================================================================\n");
         printf(
             "\nConnected to [Client's IP %s, port %s] through SERVER's port %s",
             clientHost, clientService, portNum);
-        printf("\n============================================================="
-               "===============\n");
+        printf("\n============================================================================\n");
       }
     }
 #elif defined _WIN32
@@ -375,20 +311,15 @@ int main(int argc, char *argv[]) {
 
       returnValue = getnameinfo(
           (struct sockaddr *)&clientAddress, addrlen, clientHost,
-          sizeof(clientHost), clientService, sizeof(clientService),
-          NI_NUMERICHOST); // NI_NUMERICHOST > converge to number flag
+          sizeof(clientHost), clientService, sizeof(clientService),NI_NUMERICHOST);
       if (returnValue != 0) {
-        printf("\nError detected: getnameinfo() failed with error#%d\n",
-               WSAGetLastError());
+        printf("\nError detected: getnameinfo() failed with error#%d\n", WSAGetLastError());
         exit(1);
       } else {
-        printf("\n============================================================="
-               "===============\n");
+        printf("\n============================================================================\n");
         printf(
-            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s",
-            clientHost, clientService, portNum);
-        printf("\n============================================================="
-               "===============\n");
+            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s", clientHost, clientService, portNum);
+        printf("\n============================================================================\n");
       }
     }
 
@@ -520,7 +451,6 @@ int main(int argc, char *argv[]) {
 
       //---
       if (strncmp(receive_buffer, "TYPE", 4) == 0) {
-
         bytes = 0;
         printf("<--TYPE command received.\n\n");
 
@@ -539,19 +469,18 @@ int main(int argc, char *argv[]) {
 
         switch (toupper(objType)) {
         case 'I':
-          file_type = FileType::BINARY;
-          printf("using binary mode to transfer files.\n");
+          file_type = FileType::BINARY; // image file
+          printf("using BINARY mode to transfer files.\n");
           count = snprintf(send_buffer, BUFFER_SIZE, "200 command OK.\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0)
-            break;
-
+          if (bytes < 0) break;
           break;
+
         case 'A':
-          file_type = FileType::TEXT;
+          file_type = FileType::TEXT; // text file
           printf("using ASCII mode to transfer files.\n");
           count = snprintf(send_buffer, BUFFER_SIZE, "200 command OK.\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
@@ -559,33 +488,28 @@ int main(int argc, char *argv[]) {
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
 
-          if (bytes < 0)
-            break;
-
+          if (bytes < 0) break;
           break;
+
         default:
-          count = snprintf(send_buffer, BUFFER_SIZE,
-                           "501 Syntax error in arguments\r\n");
+          count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0)
-            break;
+          if (bytes < 0) break;
           break;
         }
       }
       //---
       if (strncmp(receive_buffer, "STOR", 4) == 0) {
         printf("unrecognised command \n");
-        count = snprintf(send_buffer, BUFFER_SIZE,
-                         "502 command not implemented\r\n");
+        count = snprintf(send_buffer, BUFFER_SIZE, "502 command not implemented\r\n");
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
         }
         printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0)
-          break;
+        if (bytes < 0) break;
       }
       //---
       if (strncmp(receive_buffer, "RETR", 4) == 0) {
@@ -596,25 +520,28 @@ int main(int argc, char *argv[]) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0)
-            break;
-        } else {
-          count = snprintf(send_buffer, BUFFER_SIZE, "150 opening ASCII mode data connection. \r\n");
+          if (bytes < 0) break;
+        }
+
+        else {
+          count = snprintf(send_buffer, BUFFER_SIZE, "150 opening Binary mode data connection. \r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
             printf("[DEBUG INFO] <-- %s\n", send_buffer);
           }
-          if (bytes < 0)
-            break;
+          if (bytes < 0) break;
+          printf("Connecting to client");
           s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
+          // connection failed
           if (connect(s_data_act, (struct sockaddr *)&clientAddress_act, addr_len) != 0) {
             printf("Error connecting to client\n");
-#if defined __unix__ || defined __APPLE__
-            close(s_data_act);
-#elif defined _WIN32
-            closesocket(s_data_act);
-#endif
-          } else {
+            #if defined __unix__ || defined __APPLE__
+              close(s_data_act);
+            #elif defined _WIN32
+              closesocket(s_data_act);
+            #endif
+          }
+          else {
             char filename[BUFFER_SIZE];
             memset(filename, '\0', sizeof(filename));
             int i = 5; // extract from the 5th char (skip "RETR " command)
@@ -623,20 +550,22 @@ int main(int argc, char *argv[]) {
               i++;
             }
             ifstream retr_file(filename, ios::binary);
+
             if (!retr_file.is_open()) {
-#if defined __unix__ || defined __APPLE__
-              close(s_data_act);
-#elif defined _WIN32
-              closesocket(s_data_act);
-#endif
+              #if defined __unix__ || defined __APPLE__
+                close(s_data_act);
+              #elif defined _WIN32
+                closesocket(s_data_act);
+              #endif
+
               count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
                 printf("[DEBUG INFO] <-- %s\n", send_buffer);
               }
-              if (bytes < 0)
-                break;
-            } else {
+              if (bytes < 0) break;
+            }
+            else {
               char buffer[500];
               while (!retr_file.eof()) {
                 retr_file.read(buffer, sizeof(buffer));
@@ -644,31 +573,25 @@ int main(int argc, char *argv[]) {
                 send(s_data_act, buffer, bytes_read, 0);
               }
               retr_file.close();
-#if defined __unix__ || defined __APPLE__
-              close(s_data_act);
-#elif defined _WIN32
-              closesocket(s_data_act);
-#endif
+
+              #if defined __unix__ || defined __APPLE__
+                close(s_data_act);
+              #elif defined _WIN32
+                closesocket(s_data_act);
+              #endif
+
               count = snprintf(send_buffer, BUFFER_SIZE, "226 File transfer complete. \r\n");
+
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
                 printf("[DEBUG INFO] <-- %s\n", send_buffer);
               }
-              if (bytes < 0)
-                break;
+              if (bytes < 0) break;
             }
           }
         }
-        // printf("unrecognised command \n");
-        // count = snprintf(send_buffer, BUFFER_SIZE,
-        //                  "502 command not implemented\r\n");
-        // if (count >= 0 && count < BUFFER_SIZE) {
-        //   bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        // }
-        // printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        // if (bytes < 0)
-        //   break;
       }
+
       //---
       if (strncmp(receive_buffer, "OPTS", 4) == 0) {
         count =
@@ -681,12 +604,9 @@ int main(int argc, char *argv[]) {
           break;
       }
       //---
-
-      //---
       if (strncmp(receive_buffer, "CWD", 3) == 0) {
         printf("unrecognised command \n");
-        count = snprintf(send_buffer, BUFFER_SIZE,
-                         "502 command not implemented\r\n");
+        count = snprintf(send_buffer, BUFFER_SIZE, "502 command not implemented\r\n");
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
         }
@@ -697,8 +617,7 @@ int main(int argc, char *argv[]) {
       //---
       if (strncmp(receive_buffer, "QUIT", 4) == 0) {
         printf("Quit \n");
-        count = snprintf(send_buffer, BUFFER_SIZE,
-                         "221 Connection close by client\r\n");
+        count = snprintf(send_buffer, BUFFER_SIZE, "221 Connection close by client\r\n");
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
         }
@@ -708,9 +627,8 @@ int main(int argc, char *argv[]) {
       }
       //---
       if (strncmp(receive_buffer, "PORT", 4) == 0) {
+        // We decide to keep the Ipv4 stuff as Port should be ONLY specific to IPv4 addresses
         s_data_act = socket(AF_INET, SOCK_STREAM, 0);
-        // local variables
-        // unsigned char act_port[2];
         int act_port[2];
         int act_ip[4], port_dec;
         char ip_decimal[NI_MAXHOST];
@@ -723,83 +641,63 @@ int main(int argc, char *argv[]) {
                                   &act_ip[3], &act_port[0], &act_port[1]);
 
         if (scannedItems < 6) {
-          count = snprintf(send_buffer, BUFFER_SIZE,
-                           "501 Syntax error in arguments \r\n");
+          count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments \r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0)
-            break;
+          if (bytes < 0) break;
         }
 
-        clientAddress_act_Ipv4.sin_family =
-            AF_INET; // local_data_addr_act  //ipv4 only, needs to be replaced.
-        count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0],
-                         act_ip[1], act_ip[2], act_ip[3]);
+        clientAddress_act_Ipv4.sin_family = AF_INET; // Port should be specific to IPv4
+        count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2], act_ip[3]);
 
-        if (!(count >= 0 && count < BUFFER_SIZE))
-          break;
+        if (!(count >= 0 && count < BUFFER_SIZE)) break;
 
-        printf("\tCLIENT's IP is %s\n", ip_decimal); // IPv4 format
-        clientAddress_act_Ipv4.sin_addr.s_addr =
-            inet_addr(ip_decimal); // ipv4 only, needs to be replaced.
+        printf("\tCLIENT's IP is %s\n", ip_decimal);
+        clientAddress_act_Ipv4.sin_addr.s_addr = inet_addr(ip_decimal); // Port should be specific to IPv4
         port_dec = act_port[0];
         port_dec = port_dec << 8;
         port_dec = port_dec + act_port[1];
         printf("\tCLIENT's Port is %d\n", port_dec);
         printf("===================================================\n");
 
-        clientAddress_act_Ipv4.sin_port =
-            htons(port_dec); // ipv4 only, needs to be replaced
+        clientAddress_act_Ipv4.sin_port = htons(port_dec); // Port should be specific to IPv4
 
-        count = snprintf(send_buffer, BUFFER_SIZE,
-                         "200 PORT Command successful\r\n");
+        count = snprintf(send_buffer, BUFFER_SIZE, "200 PORT Command successful\r\n");
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
         }
       }
       //---
-      if (strncmp(receive_buffer, "EPRT", 4) == 0) {
+      if (strncmp(receive_buffer, "EPRT", 4) == 0) {  // available for BOTH IPv4 and Ipv6
 
         printf("===================================================\n");
         printf("\tActive FTP mode, the client is listening... \n");
 
-        int af; // Address Family
+        int af;
         int port;
-        char ip_address[INET6_ADDRSTRLEN]; // For IPv6
-        active = 1; // active mode
+        char ip_address[INET6_ADDRSTRLEN];
+        active = 1; // Flag to active mode
 
         // Parse the EPRT command (pattern: EPRT |protocol|ip|port| , protocol: 1= Ipv4, 2 = Ipv6)
         int scannedItems = sscanf(receive_buffer, "EPRT |%d|%[^|]|%d|", &af, ip_address, &port);
 
         if (scannedItems < 3 ||
             (af != 1 && af != 2)) { // scannedItems < 3 => not enough parameter, af !=1 or !=2 => wrong protocol
-          count = snprintf(send_buffer, BUFFER_SIZE,
-                           "501 Syntax error in arguments\r\n");
+          count = snprintf(send_buffer, BUFFER_SIZE,"501 Syntax error in arguments\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0)
-            break;
+          if (bytes < 0) break;
         } else {
           if (af == 1) { // IPv4
             struct sockaddr_in *clientAddress_act_ipv4 =
                 (struct sockaddr_in *)&clientAddress_act;
             clientAddress_act_ipv4->sin_family = AF_INET;
             clientAddress_act_ipv4->sin_port = htons(port);
-            /*/ DEBUGS USE //
-            printf("IPv4 Address:\n");
-            printf("\tFamily: %d\n", clientAddress_act_ipv4->sin_family);
-            printf("\tPort: %d\n", ntohs(clientAddress_act_ipv4->sin_port));
-            char ipv4_str[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, &(clientAddress_act_ipv4->sin_addr), ipv4_str,
-                      INET_ADDRSTRLEN);
-            printf("\tIP Address: %s\n", ipv4_str);
-            // DEBUGS USE /*/
-
             inet_pton(AF_INET, ip_address, &(clientAddress_act_ipv4->sin_addr));
             addr_len = sizeof(struct sockaddr_in);
           } else if (af == 2) { // IPv6
@@ -807,15 +705,7 @@ int main(int argc, char *argv[]) {
                 (struct sockaddr_in6 *)&clientAddress_act;
             clientAddress_act_ipv6->sin6_port = htons(port);
             clientAddress_act_ipv6->sin6_family = AF_INET6;
-            /*/ DEBUGS USE //
-            printf("IPv6 Address:\n");
-            printf("\tFamily: %d (hex: 0x%x)\n",
-                   clientAddress_act_ipv6->sin6_family,
-                   clientAddress_act_ipv6->sin6_family);
-            printf("\tPort: %d\n", ntohs(clientAddress_act_ipv6->sin6_port));
-            char ipv6_str[INET6_ADDRSTRLEN];
-            // DEBUGS USE /*/
-            inet_pton(AF_INET6, ip_address,
+             inet_pton(AF_INET6, ip_address,
                       &(clientAddress_act_ipv6->sin6_addr));
             if (inet_pton(AF_INET6, ip_address,
                           &(clientAddress_act_ipv6->sin6_addr)) <= 0) {
@@ -823,54 +713,49 @@ int main(int argc, char *argv[]) {
             }
             addr_len = sizeof(struct sockaddr_in6);
           }
-          // Send success response
-          /*/ DEBUGS USE //
-          printClientAddress(&clientAddress_act);
-          // DEBUGS USE /*/
-          count = snprintf(send_buffer, BUFFER_SIZE,
-                           "200 EPRT Command successful\r\n");
+
+          count = snprintf(send_buffer, BUFFER_SIZE,"200 EPRT Command successful\r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
             printf("[DEBUG INFO] <-- %s\n", send_buffer);
           }
-          if (bytes < 0)
-            break;
+          if (bytes < 0) break;
         }
       }
       // ---
 
-      // technically, LIST is different than NLST,but we make them the same here
-      if ((strncmp(receive_buffer, "LIST", 4) == 0) ||
-          (strncmp(receive_buffer, "NLST", 4) == 0)) {
+      // technically, LIST is different from NLST,but we make them the same here
+      if ((strncmp(receive_buffer, "LIST", 4) == 0) || (strncmp(receive_buffer, "NLST", 4) == 0)) {
         printf("===================================================\n");
         printf("\tOpening data socket..... \n");
-
-        // =======
-
         s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
+
         if (s_data_act == INVALID_SOCKET) {
           printf("Error at socket(): %d\n", WSAGetLastError());
-#if defined _WIN32
-          WSACleanup();
-#endif
-        } else {
+      #if defined _WIN32
+          WSACleanup(); // only for window
+      #endif
+        }
+
+        else {
           iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act, sizeof(clientAddress_act));
-          if (iResult != 0) {
+          if (iResult != 0) { // connection fail
             count = snprintf(
-                send_buffer, BUFFER_SIZE,
-                "425 Something is wrong, can't start active connection... \r\n");
+                send_buffer, BUFFER_SIZE,"425 Data Socket Connection Failure... \r\n");
             if (count >= 0 && count < BUFFER_SIZE) {
               bytes = send(ns, send_buffer, strlen(send_buffer), 0);
               printf("[DEBUG INFO] <-- %s\n", send_buffer);
             }
-            printf("Error connecting to client\n");
+
 #if defined __unix__ || defined __APPLE__
             close(s_data_act);
 #elif defined _WIN32
             closesocket(s_data_act);
 #endif
             break;
-          } else {
+          }
+
+          else {
             printf("Connected to client\n");
             count = snprintf( send_buffer, BUFFER_SIZE, "150 opening ASCII mode data connection\n");
             if (count >= 0 && count < BUFFER_SIZE) {
@@ -898,20 +783,14 @@ int main(int argc, char *argv[]) {
               if (count >= 0 && count < BUFFER_SIZE) {
                 if (active == 0){
                   send(ns_data, send_buffer, strlen(send_buffer), 0);
-                  /*/ DEBUGS USE //
-                  printf("Sending w/ns_data: %s", send_buffer);
-                  // DEBUGS USE /*/
                 } else {
                   send(s_data_act, send_buffer, strlen(send_buffer), 0);
-                  /*/ DEBUGS USE //
-                  printf("Sending w/ns_data_act: %s", send_buffer);
-                  // DEBUGS USE /*/
                 }
               }
             }
           }
-
           fclose(fin);
+
 #if defined __unix__ || defined __APPLE__
           if (active == 0)
             close(ns_data);
@@ -924,16 +803,15 @@ int main(int argc, char *argv[]) {
           else
             closesocket(s_data_act);
 #endif
-          count = snprintf(send_buffer, BUFFER_SIZE,
-                           "226 File transfer complete. \r\n");
+
+          count = snprintf(send_buffer, BUFFER_SIZE,"226 File transfer complete. \r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
             printf("[DEBUG INFO] <-- %s\n", send_buffer);
           }
         }
       }
-      // OPTIONAL, delete the temporary file
-      system("del tmp.txt");
+      //system("del tmp.txt");
 
       //---
       //=================================================================================
