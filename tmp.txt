@@ -3,13 +3,15 @@
 
  Directory of C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1
 
-2024/04/21  上午 12:27    <DIR>          .
-2024/04/21  上午 12:27    <DIR>          ..
+2024/04/21  上午 02:43    <DIR>          .
+2024/04/21  上午 02:43    <DIR>          ..
 2024/04/15  下午 09:48                31 .gitignore
-2024/04/21  上午 12:23    <DIR>          .idea
+2024/04/21  上午 02:42    <DIR>          .idea
 2024/04/10  上午 05:46    <DIR>          .vscode
 2019/02/18  上午 10:24           100,376 black.jpg
 2024/04/10  上午 05:46                18 clean.bat
+2024/04/21  上午 02:31                 0 ddd.txt
+2024/04/21  上午 02:34                 0 defined
 2024/04/10  上午 05:46    <DIR>          images
 2024/04/10  上午 06:49               690 makefile
 2024/04/10  上午 06:49               163 makefile - macOS
@@ -19,12 +21,14 @@
 2024/04/10  上午 05:46                48 README.md
 2024/04/10  上午 06:49             1,142 sample_ftp_ipv4_interaction.txt
 2024/04/10  上午 06:49             1,173 sample_ftp_ipv6_interaction.txt
-2024/04/21  上午 12:26            31,606 server.cpp
-2024/04/21  上午 12:26           246,540 server.exe
-2024/04/21  上午 12:28    <DIR>          test
-2009/04/22  下午 05:10           206,374 test.jpg
-2013/02/26  下午 06:16             9,560 test2.jpg
-2024/04/21  上午 12:28                 0 tmp.txt
+2024/04/21  上午 02:41            33,967 server.cpp
+2024/04/21  上午 02:43           247,564 server.exe
+2024/04/21  上午 02:45    <DIR>          test
+2016/12/24  下午 08:02            58,990 test1.gif
+2016/12/24  下午 08:02            79,909 test2.gif
+2016/12/24  下午 08:02            73,149 test3.gif
+2016/12/24  下午 07:36            83,576 test4.gif
+2024/04/21  上午 02:45                 0 tmp.txt
 2024/04/10  上午 06:49            71,993 white.jpg
-              17 File(s)        672,212 bytes
-               6 Dir(s)  118,850,236,416 bytes free
+              21 File(s)        755,287 bytes
+               6 Dir(s)  118,659,325,952 bytes free

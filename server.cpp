@@ -513,24 +513,33 @@ int main(int argc, char *argv[]) {
       }
       //---
       if (strncmp(receive_buffer, "RETR", 4) == 0) {
-        if (file_type != FileType::BINARY) {
-          printf("cannot transfer this file \n");
-          count = snprintf(send_buffer, BUFFER_SIZE, "550 file cannot be transferred. \r\n");
+
+        if (file_type == FileType::UNKNOWN) {
+          printf("ERROR - Unknown file type\n");
+          count = snprintf(send_buffer, BUFFER_SIZE, "550 Please Select Data Mode before transfer. \r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
           }
           printf("[DEBUG INFO] <-- %s\n", send_buffer);
           if (bytes < 0) break;
-        }
-
-        else {
+        } else if (file_type == FileType::TEXT) {
+          // we are assuming that image files can only be transferred if FileType is set to binary.
+          printf("TEXT file \n");
+          count = snprintf(send_buffer, BUFFER_SIZE, "550 DO NOT support Text file transfer. \r\n");
+          if (count >= 0 && count < BUFFER_SIZE) {
+            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+          }
+          printf("[DEBUG INFO] <-- %s\n", send_buffer);
+          if (bytes < 0) break;
+        } else {
+          printf("BINARY file \n");
           count = snprintf(send_buffer, BUFFER_SIZE, "150 opening Binary mode data connection. \r\n");
           if (count >= 0 && count < BUFFER_SIZE) {
             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
             printf("[DEBUG INFO] <-- %s\n", send_buffer);
           }
           if (bytes < 0) break;
-          printf("Connecting to client");
+          printf("Connecting to client\n");
           s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
           // connection failed
           if (connect(s_data_act, (struct sockaddr *)&clientAddress_act, addr_len) != 0) {
@@ -542,49 +551,92 @@ int main(int argc, char *argv[]) {
             #endif
           }
           else {
+
             char filename[BUFFER_SIZE];
             memset(filename, '\0', sizeof(filename));
-            int i = 5; // extract from the 5th char (skip "RETR " command)
+
+            char extension[BUFFER_SIZE];
+            memset(extension, '\0', sizeof(extension));
+
+            // Extract filename and file extension
+
+            int i = 5;  // extract from the 5th char (skip "RETR " command)
+            int j = 0;  // full file name
+            int k = -1;  // file extension
             while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
-              filename[i-5] = receive_buffer[i];
-              i++;
-            }
-            ifstream retr_file(filename, ios::binary);
-
-            if (!retr_file.is_open()) {
-              #if defined __unix__ || defined __APPLE__
-                close(s_data_act);
-              #elif defined _WIN32
-                closesocket(s_data_act);
-              #endif
-
-              count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
-              if (count >= 0 && count < BUFFER_SIZE) {
-                bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                printf("[DEBUG INFO] <-- %s\n", send_buffer);
+              //filename[i-5] = receive_buffer[i];
+              filename[j] = receive_buffer[i];
+              if (receive_buffer[i] == '.') {
+                k = 0;
+              } else if ( k >= 0) {
+                extension[k] = receive_buffer[i];
+                k++;
               }
-              if (bytes < 0) break;
+              i++;
+              j++;
+            }
+
+            printf("The filename is %s\n", filename);
+            printf("The extension is %s\n", extension);
+
+            bool is_image = false;
+            if (strcmp(extension, "jpg") == 0 || strcmp(extension, "jpeg") == 0 ||
+                strcmp(extension, "bmp") == 0 || strcmp(extension, "gif") == 0 ||
+                strcmp(extension, "tiff") == 0 || strcmp(extension, "png") == 0) {
+              is_image = true;
+            }
+
+            if (is_image) {
+              ifstream retr_file(filename, ios::binary);
+
+              if (!retr_file.is_open()) {
+                #if defined __unix__ || defined __APPLE__
+                  close(s_data_act);
+                #elif defined _WIN32
+                  closesocket(s_data_act);
+                #endif
+
+                count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
+                if (count >= 0 && count < BUFFER_SIZE) {
+                  bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+                  printf("[DEBUG INFO] <-- %s\n", send_buffer);
+                }
+                if (bytes < 0) break;
+              }
+              else {
+                char buffer[500];
+                while (!retr_file.eof()) {
+                  retr_file.read(buffer, sizeof(buffer));
+                  int bytes_read = retr_file.gcount();
+                  send(s_data_act, buffer, bytes_read, 0);
+                }
+                retr_file.close();
+
+                #if defined __unix__ || defined __APPLE__
+                 close(s_data_act);
+                #elif defined _WIN32
+                 closesocket(s_data_act);
+                #endif
+
+                count = snprintf(send_buffer, BUFFER_SIZE, "226 File transfer complete. \r\n");
+
+                if (count >= 0 && count < BUFFER_SIZE) {
+                  bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+                  printf("[DEBUG INFO] <-- %s\n", send_buffer);
+                }
+                if (bytes < 0) break;
+              }
             }
             else {
-              char buffer[500];
-              while (!retr_file.eof()) {
-                retr_file.read(buffer, sizeof(buffer));
-                int bytes_read = retr_file.gcount();
-                send(s_data_act, buffer, bytes_read, 0);
-              }
-              retr_file.close();
-
               #if defined __unix__ || defined __APPLE__
                 close(s_data_act);
               #elif defined _WIN32
                 closesocket(s_data_act);
               #endif
 
-              count = snprintf(send_buffer, BUFFER_SIZE, "226 File transfer complete. \r\n");
-
+              count = snprintf(send_buffer, BUFFER_SIZE, "450 Unsupported file format. \r\n");
               if (count >= 0 && count < BUFFER_SIZE) {
                 bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                printf("[DEBUG INFO] <-- %s\n", send_buffer);
               }
               if (bytes < 0) break;
             }

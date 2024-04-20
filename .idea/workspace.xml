@@ -18,6 +18,9 @@
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +122,7 @@
       <workItem from="1713422389275" duration="4581000" />
       <workItem from="1713436077522" duration="1727000" />
       <workItem from="1713480272261" duration="628000" />
-      <workItem from="1713609554854" duration="6437000" />
+      <workItem from="1713609554854" duration="13198000" />
     </task>
     <servers />
   </component>
