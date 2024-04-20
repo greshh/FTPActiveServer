@@ -40,13 +40,12 @@
 #elif defined __WIN32__
 #include <iostream>
 #include <stdio.h>
-//#include <stdlib.h>
 #include <string>
 #include <winsock2.h>
 #include <ws2tcpip.h> //required by getaddrinfo() and special constants
 #include <fstream>
-#include <filesystem>
 #include <io.h>
+#include <stdbool.h>
 #define WSVERS MAKEWORD(2, 2)
 
 
@@ -70,21 +69,21 @@ void closeSocket(int ns) {
 #endif
 }
 
-void sendSystemMessage(int ns, char *send_buffer, int BUFFER_SIZE,const char *errorMessage) {
+void sendSystemMessage(int ns, char *send_buffer, int BUFFER_SIZE,const char *message) {
   int count, bytes;
 
-  count = snprintf(send_buffer, BUFFER_SIZE,errorMessage);
+  count = snprintf(send_buffer, BUFFER_SIZE,message);
   if (count >= 0 && count < BUFFER_SIZE) {
     bytes = send(ns, send_buffer, strlen(send_buffer), 0);
   }
-  printf("[DEBUG INFO] <-- %s\n", send_buffer);
+  if (message[0] == '4' || message[0] == '5') {
+    printf("[DEBUG INFO] <-- %s\n", send_buffer);
+  } else {
+    printf("<-- %s\n", send_buffer);
+  }
+  //printf("[DEBUG INFO] <-- %s\n", send_buffer);
   if (bytes<0) return;
 }
-
-
-
-
-
 
 //********************************************************************
 // MAIN
@@ -114,7 +113,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2) {
-    printf("[DEBUG INFO] <-- UCould not find a usable version of Winsock.dll\n");
+    printf("[DEBUG INFO] <-- Could not find a usable version of Winsock.dll\n");
     WSACleanup();
     exit(1);
   }
@@ -199,7 +198,6 @@ int main(int argc, char *argv[]) {
   } else { //use default port 1234
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
     sprintf(portNum, "%s", DEFAULT_PORT);
-    printf("\n[DEBUG INFO] <-- Using DEFAULT_PORT = %s\n", portNum);
   }
 
   if (iResult != 0) {
@@ -320,7 +318,7 @@ int main(int argc, char *argv[]) {
       } else {
         printf("\n============================================================================\n");
         printf(
-            "\n[DEBUG INFO] <-- Connected to [Client's IP %s, port %s] through SERVER's port %s",
+            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s",
             clientHost, clientService, portNum);
         printf("\n============================================================================\n");
       }
@@ -347,7 +345,7 @@ int main(int argc, char *argv[]) {
       } else {
         printf("\n============================================================================\n");
         printf(
-            "\n[DEBUG INFO] <-- Connected to [Client's IP %s, port %s] through SERVER's port %s", clientHost, clientService, portNum);
+            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s", clientHost, clientService, portNum);
         printf("\n============================================================================\n");
       }
     }
@@ -358,12 +356,6 @@ int main(int argc, char *argv[]) {
     // Respond with welcome message
     //*******************************************************************
     sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"220 FTP Server ready. \r\n");
-    /*
-    count = snprintf(send_buffer, BUFFER_SIZE, "220 FTP Server ready. \r\n");
-    if (count >= 0 && count < BUFFER_SIZE) {
-      bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-    }
-     */
 
     //********************************************************************
     // COMMUNICATION LOOP per CLIENT
@@ -398,7 +390,7 @@ int main(int argc, char *argv[]) {
       }
 
       if (bytes == 0)
-        printf("\n[DEBUG INFO] <-- client has gracefully exited.\n");
+        printf("\nClient has gracefully exited.\n");
 
 // 2nd error checking after receiving data
 #if defined __unix__ || defined __APPLE__
@@ -408,7 +400,7 @@ int main(int argc, char *argv[]) {
       if ((bytes == SOCKET_ERROR) || (bytes == 0))
         break;
 #endif
-      printf("[DEBUG INFO] <-- command received:  '%s\\r\\n' \n", receive_buffer);
+      printf("Command received:  '%s\\r\\n' \n", receive_buffer);
 
       //********************************************************************
       // PROCESS COMMANDS/REQUEST FROM USER
@@ -426,20 +418,11 @@ int main(int argc, char *argv[]) {
           username[i - 5] = receive_buffer[i];
           i++;
         }
-        printf("[DEBUG INFO] <-- User name: %s\n", username);
-        printf("[DEBUG INFO] <-- Logging in... \n");
+        printf("User name: %s\n", username);
+        printf("Logging in... \n");
 
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "331 Password required \r\n");
-        /*
-        count = snprintf(send_buffer, BUFFER_SIZE, "331 Password required \r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0)
-          break;
-          */
       }
       //---
       if (strncmp(receive_buffer, "PASS", 4) == 0) {
@@ -462,7 +445,7 @@ int main(int argc, char *argv[]) {
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
         }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
+        printf("%s\n", send_buffer);
         if (!(strcmp(username, user) == 0 && strcmp(password, pass) == 0)) break;
         if (bytes < 0) break;
       }
@@ -474,7 +457,7 @@ int main(int argc, char *argv[]) {
         if (count >= 0 && count < BUFFER_SIZE) {
           bytes = send(ns, send_buffer, strlen(send_buffer), 0);
         }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
+        printf("%s\n", send_buffer);
         if (bytes < 0) break;
       }
 
@@ -488,59 +471,27 @@ int main(int argc, char *argv[]) {
         if (scannedItems < 1) {
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "501 Syntax error in arguments\r\n");
-          /*count = snprintf(send_buffer, BUFFER_SIZE,"501 Syntax error in arguments\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-           */
         }
 
         switch (toupper(objType)) {
         case 'I':
           file_type = FileType::BINARY; // image file
-          printf("[DEBUG INFO] <-- Using BINARY mode to transfer files.\n");
+          printf("Using BINARY mode to transfer files.\n");
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"200 Binary command OK.\r\n");
-
-          /*count = snprintf(send_buffer, BUFFER_SIZE, "200 Binary command OK.\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-          */
           break;
 
 
         case 'A':
           file_type = FileType::TEXT; // text file
-          printf("[DEBUG INFO] <--  Using ASCII mode to transfer files.\n");
+          printf("Using ASCII mode to transfer files.\n");
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "200 ASCII command OK.\r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE, "200 ASCII command OK.\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-
-          if (bytes < 0) break;
-          */
           break;
 
 
         default:
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "501 Syntax error in arguments\r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-           */
           break;
         }
       }
@@ -551,7 +502,7 @@ int main(int argc, char *argv[]) {
         int act_port[2];
         int act_ip[4], port_dec;
         char ip_decimal[NI_MAXHOST];
-        printf("[DEBUG INFO] <-- Active FTP mode, the client is listening... \n");
+        printf("Active FTP mode, the client is listening... \n");
         active = 1; // flag for active connection
 
         int scannedItems = sscanf(receive_buffer, "PORT %d,%d,%d,%d,%d,%d",
@@ -561,14 +512,6 @@ int main(int argc, char *argv[]) {
         if (scannedItems < 6) {
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "501 Syntax error in arguments\r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-           */
         }
 
         clientAddress_act_Ipv4.sin_family = AF_INET; // Port should be specific to IPv4
@@ -576,29 +519,22 @@ int main(int argc, char *argv[]) {
 
         if (!(count >= 0 && count < BUFFER_SIZE)) break;
 
-        printf("[DEBUG INFO] <-- CLIENT's IP is %s\n", ip_decimal);
+        printf("CLIENT's IP is %s\n", ip_decimal);
         clientAddress_act_Ipv4.sin_addr.s_addr = inet_addr(ip_decimal); // Port should be specific to IPv4
         port_dec = act_port[0];
         port_dec = port_dec << 8;
         port_dec = port_dec + act_port[1];
-        printf("[DEBUG INFO] <-- CLIENT's Port is %d\n", port_dec);
+        printf("CLIENT's Port is %d\n", port_dec);
 
         clientAddress_act_Ipv4.sin_port = htons(port_dec); // Port should be specific to IPv4
 
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "200 PORT Command successful\r\n");
-
-        /*count = snprintf(send_buffer, BUFFER_SIZE, "200 PORT Command successful\r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        }
-         */
       }
       //---
       if (strncmp(receive_buffer, "EPRT", 4) == 0) {  // available for BOTH IPv4 and Ipv6
 
-        printf("[DEBUG INFO] <-- Active FTP mode, the client is listening... \n");
+        printf("Active FTP mode, the client is listening... \n");
 
         int af;
         int port;
@@ -611,13 +547,6 @@ int main(int argc, char *argv[]) {
         if (scannedItems < 3 || (af != 1 && af != 2)) { // scannedItems < 3 => not enough parameter, af !=1 or !=2 => wrong protocol
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "501 Syntax error in arguments\r\n");
-          /*count = snprintf(send_buffer, BUFFER_SIZE,"501 Syntax error in arguments\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-           */
         }
         else {
           if (af == 1) { // IPv4
@@ -640,21 +569,14 @@ int main(int argc, char *argv[]) {
 
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "200 EPRT Command successful\r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE,"200 EPRT Command successful\r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-            printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          }
-          if (bytes < 0) break;
-           */
+
         }
       }
       // ---
 
       // technically, LIST is different from NLST,but we make them the same here
       if ((strncmp(receive_buffer, "LIST", 4) == 0) || (strncmp(receive_buffer, "NLST", 4) == 0)) {
-        printf("[DEBUG INFO] <-- Opening data socket..... \n");
+        printf("Opening data socket..... \n");
         s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
 
         if (s_data_act == INVALID_SOCKET) {
@@ -669,13 +591,6 @@ int main(int argc, char *argv[]) {
           if (iResult != 0) { // connection fail
             sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                               "425 Data Socket Connection Failure... \r\n");
-            /*
-            count = snprintf( send_buffer, BUFFER_SIZE,"425 Data Socket Connection Failure... \r\n");
-            if (count >= 0 && count < BUFFER_SIZE) {
-              bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-              printf("[DEBUG INFO] <-- %s\n", send_buffer);
-            }
-             */
 
             //closeSocket(s_data_act);
             if (active == 0) closeSocket(ns_data);
@@ -684,29 +599,21 @@ int main(int argc, char *argv[]) {
           }
 
           else {
-            printf("[DEBUG INFO] <-- Connected to client\n");
+            printf("Connected to client\n");
             sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                               "150 opening ASCII mode data connection\n");
-            /*
-            count = snprintf( send_buffer, BUFFER_SIZE, "150 opening ASCII mode data connection\n");
-            if (count >= 0 && count < BUFFER_SIZE) {
-              bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-              printf("[DEBUG INFO] <-- %s\n", send_buffer);
-            }
-             */
           }
           #if defined __unix__ || defined __APPLE__
             int i = system("ls -la > tmp.txt"); // save list to a txt file, return 0 if success
           #elif defined _WIN32
            int i = system("dir > tmp.txt"); // save list to a txt file, return 0 if success
           #endif
-          printf("[DEBUG INFO] <-- The value returned by system() was: %d.\n", i);
 
           FILE *fin;
 
           fin = fopen("tmp.txt", "r"); // open tmp.txt file in read mode
           char temp_buffer[500];
-          printf("[DEBUG INFO] <-- Transferring file...\n");
+          printf("<-- Transferring file...\n");
           while (!feof(fin)) {
             strcpy(temp_buffer, "");
             if (fgets(temp_buffer, 498, fin) != NULL) {
@@ -727,13 +634,6 @@ int main(int argc, char *argv[]) {
 
           sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                             "226 File transfer complete. \r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE,"226 File transfer complete. \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-            printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          }
-           */
         }
       }
       //system("del tmp.txt");
@@ -741,64 +641,107 @@ int main(int argc, char *argv[]) {
       //---
 
       if (strncmp(receive_buffer, "RETR", 4) == 0) {
-
         if (file_type == FileType::UNKNOWN) {
-
           sendSystemMessage(
               ns, send_buffer, BUFFER_SIZE,
               "550 Please Select Data Mode before transfer. \r\n");
-          /*
-          printf("ERROR - Unknown file type\n");
-          count = snprintf(send_buffer, BUFFER_SIZE, "550 Please Select Data Mode before transfer. \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-          }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-
-          if (bytes < 0) break;
-          */
-          //break;
         }
-
 
         else if (file_type == FileType::TEXT) {
           // we are assuming that only image files can be transferred.
-          printf("[DEBUG INFO] <-- TEXT file \n");
-          //count = snprintf(send_buffer, BUFFER_SIZE, "150 opening Binary mode data connection. \r\n");
-          sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                            "550 DO NOT support Text file transfer. \r\n");
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE, "550 DO NOT support Text file transfer. \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+          printf("TEXT file \n");
+          //sendSystemMessage(ns, send_buffer, BUFFER_SIZE, "550 DO NOT support Text file transfer. \r\n");
+          printf("<-- Connecting to client\n");
+          s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
+          // connection failed
+          if (connect(s_data_act, (struct sockaddr *)&clientAddress_act, addr_len) != 0) {
+            printf("[DEBUG INFO] <-- Error connecting to client\n");
+            if (active == 0) closeSocket(ns_data);
+            else closeSocket(s_data_act);
           }
-          printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          if (bytes < 0) break;
-           */
+
+          else{
+            char filename[BUFFER_SIZE];
+            memset(filename, '\0', sizeof(filename));
+            char extension[BUFFER_SIZE];
+            memset(extension, '\0', sizeof(extension));
+            // Extract filename and file extension
+
+            int i = 5;  // extract from the 5th char (skip "RETR " command)
+            int j = 0;  // full file name
+            int k = -1; // file extension
+            while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
+              filename[j] = receive_buffer[i];
+              if (receive_buffer[i] == '.') {
+                k = 0;
+              } else if (k >= 0) {
+                extension[k] = receive_buffer[i];
+                k++;
+              }
+              i++;
+              j++;
+            }
+
+            bool is_text = false; // assume only support txt,css, js,html format
+            if (strcmp(extension, "txt") == 0 || strcmp(extension, "css") == 0 ||
+                strcmp(extension, "js") == 0 || strcmp(extension, "html") == 0) {
+              is_text = true;
+            }
+
+            bool is_exist = true;
+              #if defined __unix__ || defined __APPLE__
+                if (access(filename, F_OK) == -1) {
+                  if (active == 0) closeSocket(ns_data);
+                  else closeSocket(s_data_act);
+              #elif defined _WIN32
+                if (_access(filename, 0) == -1) {
+                  if (active == 0) closeSocket(ns_data);
+                  else closeSocket(s_data_act);
+              #endif
+                is_exist = false;
+                sendSystemMessage(ns, send_buffer, BUFFER_SIZE, "450 File not exist. \r\n");
+            }
+            else if (!is_text) {
+              if (active == 0) closeSocket(ns_data);
+              else closeSocket(s_data_act);
+              sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
+                                "450 Incorrect file format. \r\n");
+            }
+            else if (is_text && is_exist) {
+              sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
+                                "150 opening ASCII mode data connection. \r\n");
+              ifstream retr_file(filename);
+
+              if (!retr_file.is_open()) {
+                if (active == 0) closeSocket(ns_data);
+                else closeSocket(s_data_act);
+                sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"450 cannot access file.\r\n");
+              }
+              else {
+                char buffer[500];
+                while (!retr_file.eof()) {
+                  retr_file.read(buffer, sizeof(buffer));
+                  int bytes_read = retr_file.gcount();
+                  send(s_data_act, buffer, bytes_read, 0);
+                }
+                retr_file.close();
+                if (active == 0) closeSocket(ns_data);
+                else closeSocket(s_data_act);
+
+                sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"226 File transfer complete.\r\n");
+              }
+            }
+          }
         }
 
-        else if (file_type == FileType::BINARY) { // Only 3 possibility
-          printf("[DEBUG INFO] <-- BINARY file \n");
-          /*
-          sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                            "150 opening Binary mode data connection. \r\n");
-          */
-          /*
-          count = snprintf(send_buffer, BUFFER_SIZE, "150 opening Binary mode data connection. \r\n");
-          if (count >= 0 && count < BUFFER_SIZE) {
-            bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-            printf("[DEBUG INFO] <-- %s\n", send_buffer);
-          }
-          if (bytes < 0) break;
-           */
-
-          printf("[DEBUG INFO] <-- Connecting to client\n");
+        else if (file_type == FileType::BINARY) { // Only 3 possibilities
+          printf("BINARY file \n");
+          printf("<-- Connecting to client\n");
           s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
           // connection failed
           if (connect(s_data_act, (struct sockaddr *)&clientAddress_act, addr_len) != 0) {
             printf("[DEBUG INFO] <-- Error connecting to client\n");
 
-            //closeSocket(s_data_act);
             if (active == 0) closeSocket(ns_data);
             else closeSocket(s_data_act);
 
@@ -806,10 +749,8 @@ int main(int argc, char *argv[]) {
           else {
               char filename[BUFFER_SIZE];
               memset(filename, '\0', sizeof(filename));
-
               char extension[BUFFER_SIZE];
               memset(extension, '\0', sizeof(extension));
-
               // Extract filename and file extension
 
               int i = 5;  // extract from the 5th char (skip "RETR " command)
@@ -851,32 +792,14 @@ int main(int argc, char *argv[]) {
                     is_exist = false;
                     sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                                       "450 File not exist. \r\n");
-                    /*count = snprintf(send_buffer, BUFFER_SIZE, "450 File not exist. \r\n");
-                    if (count >= 0 && count < BUFFER_SIZE) {
-                      bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                      printf("[DEBUG INFO] <-- %s\n", send_buffer);
-                    }
-                    if (bytes < 0) break;
-                     */
               }
-
               else if (!is_image) {
                     if (active == 0) closeSocket(ns_data);
                     else closeSocket(s_data_act);
 
                     sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                                      "450 Unsupported file format. \r\n");
-                    /*
-                    count = snprintf(send_buffer, BUFFER_SIZE, "450 Unsupported file format. \r\n");
-                    if (count >= 0 && count < BUFFER_SIZE) {
-                      bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                      printf("[DEBUG INFO] <-- %s\n", send_buffer);
-                    }
-                    if (bytes < 0) break;
-                     */
+                                      "450 Incorrect file format. \r\n");
               }
-
-
               else if (is_image && is_exist) {
                     sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                                       "150 opening Binary mode data connection. \r\n");
@@ -885,18 +808,7 @@ int main(int argc, char *argv[]) {
                     if (!retr_file.is_open()) {
                       if (active == 0) closeSocket(ns_data);
                       else closeSocket(s_data_act);
-                      // closeSocket(s_data_act);
-
-                      sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                                        "450 cannot access file.\r\n");
-                      /*
-                      count = snprintf(send_buffer, BUFFER_SIZE, "450 cannot access file. \r\n");
-                      if (count >= 0 && count < BUFFER_SIZE) {
-                        bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-                      }
-                      if (bytes < 0) break;
-                       */
+                      sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"450 cannot access file.\r\n");
                 }
                 else {
                   char buffer[500];
@@ -909,16 +821,7 @@ int main(int argc, char *argv[]) {
                   if (active == 0) closeSocket(ns_data);
                   else closeSocket(s_data_act);
 
-                  sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                                    "226 File transfer complete.\r\n");
-                  /*
-                  count = snprintf(send_buffer, BUFFER_SIZE, "226 File transfer complete. \r\n");
-                  if (count >= 0 && count < BUFFER_SIZE) {
-                    bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-                    printf("[DEBUG INFO] <-- %s\n", send_buffer);
-                  }
-                  if (bytes < 0) break;
-                   */
+                  sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"226 File transfer complete.\r\n");
                 }
               }
           }
@@ -929,58 +832,26 @@ int main(int argc, char *argv[]) {
       if (strncmp(receive_buffer, "OPTS", 4) == 0) {
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "550 unrecognized command\r\n");
-        /*
-        count = snprintf(send_buffer, BUFFER_SIZE, "550 unrecognized command\r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0) break;
-        */
       }
       //---
       if (strncmp(receive_buffer, "STOR", 4) == 0) {
         printf("[DEBUG INFO] <-- Unrecognised command \n");
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "502 command not implemented\r\n");
-
-        /*count = snprintf(send_buffer, BUFFER_SIZE, "502 command not implemented\r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0) break;
-         */
       }
       //---
       if (strncmp(receive_buffer, "CWD", 3) == 0) {
         printf("[DEBUG INFO] <-- Unrecognised command \n");
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "502 command not implemented\r\n");
-        /*
-        printf("unrecognised command \n");
-        count = snprintf(send_buffer, BUFFER_SIZE, "502 command not implemented\r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0) break;
-         */
+
       }
       //---
       if (strncmp(receive_buffer, "QUIT", 4) == 0) {
-        printf("[DEBUG INFO] <-- Quit \n");
+        printf("Quit \n");
         sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
                           "221 Connection close by client\r\n");
 
-        /*
-        count = snprintf(send_buffer, BUFFER_SIZE, "221 Connection close by client\r\n");
-        if (count >= 0 && count < BUFFER_SIZE) {
-          bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-        }
-        printf("[DEBUG INFO] <-- %s\n", send_buffer);
-        if (bytes < 0) break;
-         */
       }
       //=================================================================================
     } // End of COMMUNICATION LOOP per CLIENT
@@ -1003,14 +874,14 @@ int main(int argc, char *argv[]) {
     closesocket(ns);
 #endif
     printf(
-        "[DEBUG INFO] <-- DISCONNECTED from %s\n",
+        "DISCONNECTED from %s\n",
         inet_ntop(AF_INET6, &clientAddress, send_buffer, sizeof(send_buffer)));
 
     //====================================================================================
   } // End of MAIN LOOP
   //====================================================================================
 
-  printf("\n[DEBUG INFO] <-- SERVER SHUTTING DOWN...\n");
+  printf("\nSERVER SHUTTING DOWN...\n");
 
 #if defined __unix__ || defined __APPLE__
   close(s); // close listening socket
