@@ -45,7 +45,6 @@
 #include <ws2tcpip.h> //required by getaddrinfo() and special constants
 #include <fstream>
 #include <io.h>
-#include <stdbool.h>
 #define WSVERS MAKEWORD(2, 2)
 
 
@@ -81,7 +80,6 @@ void sendSystemMessage(int ns, char *send_buffer, int BUFFER_SIZE,const char *me
   } else {
     printf("<-- %s\n", send_buffer);
   }
-  //printf("[DEBUG INFO] <-- %s\n", send_buffer);
   if (bytes<0) return;
 }
 
@@ -90,19 +88,12 @@ void sendSystemMessage(int ns, char *send_buffer, int BUFFER_SIZE,const char *me
 //********************************************************************
 int main(int argc, char *argv[]) {
 
-  //********************************************************************
-  // INITIALIZATION - SOCKET library
-  //********************************************************************
-
   file_type = FileType::UNKNOWN;
 
 #if defined __unix__ || defined __APPLE__
   // nothing to do here
 
 #elif defined _WIN32
-  //********************************************************************
-  // WSSTARTUP - Window only
-  //********************************************************************
 
   int err = WSAStartup(WSVERS, &wsadata);
 
@@ -120,31 +111,29 @@ int main(int argc, char *argv[]) {
 
 #endif
 
-  struct sockaddr_storage
-      clientAddress; // IPV6-compatible - address information
-  struct sockaddr_storage
-      clientAddress_act; // IPV6-compatible - address information
+  struct sockaddr_storage clientAddress;
+  struct sockaddr_storage clientAddress_act;
   memset(&clientAddress_act, 0, sizeof(clientAddress_act));
 
   struct sockaddr_in clientAddress_act_Ipv4; // IPv4 - PORT
   socklen_t addr_len;
 
-  char clientHost[NI_MAXHOST];    // IPV6-compatible - client IP addr buffer
-  char clientService[NI_MAXSERV]; // IPV6-compatible - client port buffer
+  char clientHost[NI_MAXHOST];
+  char clientService[NI_MAXSERV];
 
   //********************************************************************
   // set the socket address structure.
   //********************************************************************
-  struct addrinfo *result = NULL; // initialize for using getaddrinfo()
+  struct addrinfo *result = NULL;
   struct addrinfo hints;
-  int iResult;  // result of getaddrinfo()
+  int iResult;
 
 #if defined __unix__ || defined __APPLE__
   int s, ns;               // socket declaration
   int ns_data, s_data_act; // socket declaration
 #elif defined _WIN32
-  SOCKET s, ns;               // socket declaration
-  SOCKET ns_data, s_data_act; // data socket declaration
+  SOCKET s, ns;
+  SOCKET ns_data, s_data_act;
 #endif
 
 #define BUFFER_SIZE 500
@@ -152,12 +141,10 @@ int main(int argc, char *argv[]) {
 
   char send_buffer[BUFFER_SIZE], receive_buffer[BUFFER_SIZE];
   int n, bytes, addrlen;
-  char portNum[NI_MAXSERV]; // NI_MAXSERV = 32
+  char portNum[NI_MAXSERV];
 
-  memset(
-      &send_buffer, 0,
-      BUFFER_SIZE); // initialize buffer
-  memset(&receive_buffer, 0, RBUFFER_SIZE); // initialize receive buffer
+  memset(&send_buffer, 0,BUFFER_SIZE);
+  memset(&receive_buffer, 0, RBUFFER_SIZE);
 
 #if defined __unix__ || defined __APPLE__
   ns_data = -1;
@@ -190,12 +177,11 @@ int main(int argc, char *argv[]) {
   hints.ai_protocol = IPPROTO_TCP;
   hints.ai_flags = AI_PASSIVE;
 
-  // Resolve the local address and port to be used by the server
   if (argc == 2) { // if we input port number
     iResult = getaddrinfo(NULL, argv[1], &hints, &result);
     sprintf(portNum, "%s", argv[1]);
 
-  } else { //use default port 1234
+  } else { // use default port 1234
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
     sprintf(portNum, "%s", DEFAULT_PORT);
   }
@@ -254,7 +240,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  freeaddrinfo(result); // free the memory allocated by the getaddrinfo function for the server's address, as it is no longer needed
+  freeaddrinfo(result);
 
   //********************************************************************
   // LISTEN
@@ -284,15 +270,14 @@ int main(int argc, char *argv[]) {
   //====================================================================================
   while (1) { // Start of MAIN LOOP
     //====================================================================================
-    addrlen = sizeof(clientAddress); // IPv4 & IPv6-compliant
+    addrlen = sizeof(clientAddress);
 
     printf("\n------------------------------------------------------------------------\n");
     printf("SERVER is waiting for an incoming connection request at port:%s", portNum);
     printf("\n------------------------------------------------------------------------\n");
 
 #if defined __unix__ || defined __APPLE__
-    ns = accept(s, (struct sockaddr *)(&clientAddress),
-                (socklen_t *)&addrlen);
+    ns = accept(s, (struct sockaddr *)(&clientAddress), (socklen_t *)&addrlen);
 #elif defined _WIN32
     ns = accept(s, (struct sockaddr *)(&clientAddress), &addrlen);
 #endif
@@ -567,8 +552,7 @@ int main(int argc, char *argv[]) {
             addr_len = sizeof(struct sockaddr_in6);
           }
 
-          sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                            "200 EPRT Command successful\r\n");
+          sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"200 EPRT Command successful\r\n");
 
         }
       }
@@ -589,8 +573,7 @@ int main(int argc, char *argv[]) {
         else {
           iResult = connect(s_data_act, (struct sockaddr *)&clientAddress_act, sizeof(clientAddress_act));
           if (iResult != 0) { // connection fail
-            sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                              "425 Data Socket Connection Failure... \r\n");
+            sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"425 Data Socket Connection Failure... \r\n");
 
             //closeSocket(s_data_act);
             if (active == 0) closeSocket(ns_data);
@@ -600,13 +583,12 @@ int main(int argc, char *argv[]) {
 
           else {
             printf("Connected to client\n");
-            sendSystemMessage(ns, send_buffer, BUFFER_SIZE,
-                              "150 opening ASCII mode data connection\n");
+            sendSystemMessage(ns, send_buffer, BUFFER_SIZE, "150 opening ASCII mode data connection\n");
           }
           #if defined __unix__ || defined __APPLE__
-            int i = system("ls -la > tmp.txt"); // save list to a txt file, return 0 if success
+            int i = system("ls -la > tmp.txt");
           #elif defined _WIN32
-           int i = system("dir > tmp.txt"); // save list to a txt file, return 0 if success
+           int i = system("dir > tmp.txt");
           #endif
 
           FILE *fin;
@@ -636,8 +618,6 @@ int main(int argc, char *argv[]) {
                             "226 File transfer complete. \r\n");
         }
       }
-      //system("del tmp.txt");
-
       //---
 
       if (strncmp(receive_buffer, "RETR", 4) == 0) {
@@ -648,9 +628,7 @@ int main(int argc, char *argv[]) {
         }
 
         else if (file_type == FileType::TEXT) {
-          // we are assuming that only image files can be transferred.
           printf("TEXT file \n");
-          //sendSystemMessage(ns, send_buffer, BUFFER_SIZE, "550 DO NOT support Text file transfer. \r\n");
           printf("<-- Connecting to client\n");
           s_data_act = socket(clientAddress_act.ss_family, SOCK_STREAM, 0);
           // connection failed
@@ -727,7 +705,6 @@ int main(int argc, char *argv[]) {
                 retr_file.close();
                 if (active == 0) closeSocket(ns_data);
                 else closeSocket(s_data_act);
-
                 sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"226 File transfer complete.\r\n");
               }
             }
@@ -747,39 +724,36 @@ int main(int argc, char *argv[]) {
 
           }
           else {
-              char filename[BUFFER_SIZE];
-              memset(filename, '\0', sizeof(filename));
-              char extension[BUFFER_SIZE];
-              memset(extension, '\0', sizeof(extension));
-              // Extract filename and file extension
 
-              int i = 5;  // extract from the 5th char (skip "RETR " command)
-              int j = 0;  // full file name
-              int k = -1; // file extension
-              while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
-                filename[j] = receive_buffer[i];
-                if (receive_buffer[i] == '.') {
-                  k = 0;
-                } else if (k >= 0) {
-                  extension[k] = receive_buffer[i];
-                  k++;
-                }
-                i++;
-                j++;
+            char filename[BUFFER_SIZE];
+            memset(filename, '\0', sizeof(filename));
+            char extension[BUFFER_SIZE];
+            memset(extension, '\0', sizeof(extension));
+            // Extract filename and file extension
+            int i = 5;  // extract from the 5th char (skip "RETR " command)
+            int j = 0;  // full file name
+            int k = -1; // file extension
+            while (receive_buffer[i] != '\0' && i < BUFFER_SIZE) {
+              filename[j] = receive_buffer[i];
+              if (receive_buffer[i] == '.') {
+                k = 0;
+              } else if (k >= 0) {
+                extension[k] = receive_buffer[i];
+                k++;
               }
-
-              bool is_image = false; // assume only support jpg, jpeg, bmp, gif, tiff, png format
-              if (strcmp(extension, "jpg") == 0 ||
-                  strcmp(extension, "jpeg") == 0 ||
-                  strcmp(extension, "bmp") == 0 ||
-                  strcmp(extension, "gif") == 0 ||
-                  strcmp(extension, "tiff") == 0 ||
-                  strcmp(extension, "png") == 0) {
-                is_image = true;
-              }
-
-              bool is_exist = true;
-
+              i++;
+              j++;
+            }
+            bool is_image = false; // assume only support jpg, jpeg, bmp, gif, tiff, png format
+            if (strcmp(extension, "jpg") == 0 ||
+                strcmp(extension, "jpeg") == 0 ||
+                strcmp(extension, "bmp") == 0 ||
+                strcmp(extension, "gif") == 0 ||
+                strcmp(extension, "tiff") == 0 ||
+                strcmp(extension, "png") == 0) {
+              is_image = true;
+            }
+            bool is_exist = true;
               #if defined __unix__ || defined __APPLE__
                 if (access(filename, F_OK) == -1) {
                     if (active == 0) closeSocket(ns_data);
@@ -809,21 +783,20 @@ int main(int argc, char *argv[]) {
                       if (active == 0) closeSocket(ns_data);
                       else closeSocket(s_data_act);
                       sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"450 cannot access file.\r\n");
-                }
-                else {
-                  char buffer[500];
-                  while (!retr_file.eof()) {
-                    retr_file.read(buffer, sizeof(buffer));
-                    int bytes_read = retr_file.gcount();
-                    send(s_data_act, buffer, bytes_read, 0);
-                  }
-                  retr_file.close();
-                  if (active == 0) closeSocket(ns_data);
-                  else closeSocket(s_data_act);
-
-                  sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"226 File transfer complete.\r\n");
-                }
               }
+              else {
+                      char buffer[500];
+                      while (!retr_file.eof()) {
+                      retr_file.read(buffer, sizeof(buffer));
+                      int bytes_read = retr_file.gcount();
+                      send(s_data_act, buffer, bytes_read, 0);
+                      }
+                      retr_file.close();
+                      if (active == 0) closeSocket(ns_data);
+                      else closeSocket(s_data_act);
+                      sendSystemMessage(ns, send_buffer, BUFFER_SIZE,"226 File transfer complete.\r\n");
+              }
+            }
           }
         }
       }

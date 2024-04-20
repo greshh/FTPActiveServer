@@ -17,7 +17,17 @@
   <component name="ChangeListManager">
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddd.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/defined" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/notes_on_mac_napoleon.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/notes_on_mac_napoleon_old.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_ftp_ipv4_interaction.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_ftp_ipv6_interaction.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test1.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/tmp.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test2.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test4.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,7 +142,7 @@
       <workItem from="1713422389275" duration="4581000" />
       <workItem from="1713436077522" duration="1727000" />
       <workItem from="1713480272261" duration="628000" />
-      <workItem from="1713609554854" duration="30331000" />
+      <workItem from="1713609554854" duration="31704000" />
     </task>
     <servers />
   </component>
