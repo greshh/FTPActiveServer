@@ -16,10 +16,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97694831-c054-4670-95ba-a83c2cc77207" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/159342-Assignment-1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/159342-Assignment-1.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/makefile" beforeDir="false" afterPath="$PROJECT_DIR$/makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test1.tst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test2.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +82,7 @@
       <recent name="C:\Users\any31\OneDrive\Massey\159342 Operating Systems and Networks\Assignment\159342 240412 A1\159342-Assignment-1" />
     </key>
   </component>
-  <component name="RunManager" selected="Makefile Application.all">
+  <component name="RunManager" selected="C/C++ File.server.cpp">
     <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="159342-Assignment-1" TARGET_NAME="server.cpp" CONFIG_NAME="server.cpp" version="1">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
@@ -91,10 +93,22 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
+    <configuration name="server.cpp" type="CppFileRunConfiguration" factoryName="CppFileRunConfiguration" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="159342-Assignment-1" TARGET_NAME="server.cpp" CONFIG_NAME="server.cpp">
+      <option name="sourceFile" value="server.cpp" />
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.runfile.CppFileBuildBeforeRunTaskProvider$BasicBuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <list>
+      <item itemvalue="C/C++ File.server.cpp" />
       <item itemvalue="Makefile Application.all" />
       <item itemvalue="Makefile Application.server.exe" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="C/C++ File.server.cpp" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -122,7 +136,7 @@
       <workItem from="1713422389275" duration="4581000" />
       <workItem from="1713436077522" duration="1727000" />
       <workItem from="1713480272261" duration="628000" />
-      <workItem from="1713609554854" duration="13198000" />
+      <workItem from="1713609554854" duration="27634000" />
     </task>
     <servers />
   </component>

@@ -2,6 +2,7 @@ CC := g++
 TARGET := server
 SRC := server.cpp
 CFLAGS := -g -Wall -O2 -std=c++11
+#CFLAGS := -g -Wall -O2 -std=c++17
 
 # Detect the operating system
 ifeq ($(OS),Windows_NT)
