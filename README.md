@@ -11,12 +11,15 @@ It can accept an optional ephemeral port to listen to, as one of its arguments -
 If the port number is not specified, it uses *port 1234* as default.
 It can be used with the commands from the built-in FTP client on Windows 10 (IPv6) - eg. `dir`, `binary`, `ascii`, `get <filename>`.
 For log-in, there is only authorised user entry - username: `napoleon`, password: `342`.
-When the FTP server receives an `OPTS` command, it will simply return `550 unrecognized command`. 
+When the FTP server receives an `OPTS` command, it will simply return `550 unrecognized command`.
+File transfer will work for any .jpg, .jpeg, .bmp, .gif, .tiff, and .png files.
 
 This was edited from a start-up code from the lecturer: Dr Napoleon Reyes. This start-up code did not implement any of the above yet.
 
 ## Instructions:
-Build the project as usual (`make`). You can either run the project with the default port number 1234:
+Build the project as usual (`make`). There are various makefiles available suitable for Windows or MacOS. Simply copy-and-paste your desired code to `makefile` according to your OS.
+
+You can either run the project with the default port number 1234:
 ```
 ./server
 ```
@@ -25,6 +28,11 @@ or, alternatively, with an optional ephemeral port, where `<port_number>` is the
 ./server <port_number>
 ```
 
+You may use the .png and .gif files provided (as well as your own files) to exercise file transfer.
+- black.jpg
+- test1.gif
+- test2.gif
+- white.png
 
 ## What we learnt:
 - Understand how an FTP server works as per the above, and how to simulate it using socket programming.
