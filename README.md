@@ -1,7 +1,7 @@
 ﻿# FTP Active Server
 ***Start:** (roughly) April 5<sup>th</sup> 2024, **Finish:** April 22<sup>nd</sup> 2024*
 
-A group project with @Any_KHY for a third-year course: Operating Systems and Networks.
+A group project with @Any_KHY for a third-year course: Operating Systems and Networks
 
 ## Scenario
 This is a simple Cross-platform, Active mode FTP server program written using socket API (preinstalled in the operating system: Windows/Linux/MacOS). The FTP server can process the following commands from the built-in FTP user agent: `USER`, `PASS`, `TYPE`, `LIST`, `EPRT`, `PORT`, `RETR` AND `QUIT`. 
@@ -17,7 +17,7 @@ File transfer will work for any .jpg, .jpeg, .bmp, .gif, .tiff, and .png files.
 This was edited from a start-up code from the lecturer: Dr Napoleon Reyes. This start-up code did not implement any of the above yet.
 
 ## Instructions:
-Build the project as usual (`make`). There are various makefiles available suitable for Windows or MacOS. Simply copy-and-paste your desired code to `makefile` according to your OS.
+From the command terminal, build the project as usual (`make`). There are various makefiles available suitable for Windows or MacOS. Simply copy-and-paste your desired code to `makefile` according to your OS.
 
 You can either run the project with the default port number 1234:
 ```
@@ -33,6 +33,8 @@ You may use the .png and .gif files provided (as well as your own files) to exer
 - test1.gif
 - test2.gif
 - white.png
+
+You can view the display when `dir` was last entered in `tmp.txt`.
 
 ## What we learnt:
 - Understand how an FTP server works as per the above, and how to simulate it using socket programming.
