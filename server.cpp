@@ -1,57 +1,31 @@
-//=======================================================================================================================
-// Course: 159.342
-// Description: Cross-platform, Active mode FTP SERVER, Start-up Code for
-// Assignment 1
-//
-// This code gives parts of the answers away but this implementation is only
-// IPv4-compliant. Remember that the assignment requires a fully IPv6-compliant
-// cross-platform FTP server that can communicate with a built-in FTP client
-// either in Windows 10, Ubuntu Linux or MacOS.
-//
-// This program is cross-platform but your assignment will be marked only in
-// Windows 10.
-//
-// You must change parts of this program to make it IPv6-compliant (replace all
-// data structures and functions that work only with IPv4).
-//
-// Hint: The sample TCP server codes show the appropriate data structures and
-// functions that work in both IPv4 and IPv6.
-//       We also covered IPv6-compliant data structures and functions in our
-//       lectures.
-//
-// Author: n.h.reyes@massey.ac.nz
-//=======================================================================================================================
+// Start-up code author: n.h.reyes@massey.ac.nz
+
 #define USE_IPV6 true // enable Ipv6
-#if defined __unix__ || defined __APPLE__
-#include <arpa/inet.h>
-#include <cstring>
-#include <errno.h>
-#include <iostream>
-#include <netdb.h> //used by getnameinfo()
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <fstream>
-#include <filesystem>
-
+  #if defined __unix__ || defined __APPLE__
+  #include <arpa/inet.h>
+  #include <cstring>
+  #include <errno.h>
+  #include <iostream>
+  #include <netdb.h> //used by getnameinfo()
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <sys/socket.h>
+  #include <sys/types.h>
+  #include <unistd.h>
+  #include <fstream>
+  #include <filesystem>
 #elif defined __WIN32__
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <winsock2.h>
-#include <ws2tcpip.h> //required by getaddrinfo() and special constants
-#include <fstream>
-#include <io.h>
-#define WSVERS MAKEWORD(2, 2)
-
-
-using namespace std;
-
-WSADATA wsadata; // Create a WSADATA object called wsadata.
-
+  #include <iostream>
+  #include <stdio.h>
+  #include <string>
+  #include <winsock2.h>
+  #include <ws2tcpip.h> //required by getaddrinfo() and special constants
+  #include <fstream>
+  #include <io.h>
+  #define WSVERS MAKEWORD(2, 2)
+  using namespace std;
+  WSADATA wsadata; // Create a WSADATA object called wsadata.
 #endif
 
 enum class FileType { BINARY, TEXT, UNKNOWN };
@@ -90,26 +64,21 @@ int main(int argc, char *argv[]) {
 
   file_type = FileType::UNKNOWN;
 
-#if defined __unix__ || defined __APPLE__
-  // nothing to do here
-
-#elif defined _WIN32
-
-  int err = WSAStartup(WSVERS, &wsadata);
-
-  if (err != 0) {
-    WSACleanup();
-    printf("[DEBUG INFO] <-- WSAStartup failed with error: %d\n", err);
-    exit(1);
-  }
-
-  if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2) {
-    printf("[DEBUG INFO] <-- Could not find a usable version of Winsock.dll\n");
-    WSACleanup();
-    exit(1);
-  }
-
-#endif
+  #if defined __unix__ || defined __APPLE__
+    // nothing to do here
+  #elif defined _WIN32
+    int err = WSAStartup(WSVERS, &wsadata);
+    if (err != 0) {
+      WSACleanup();
+      printf("[DEBUG INFO] <-- WSAStartup failed with error: %d\n", err);
+      exit(1);
+    }
+    if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2) {
+      printf("[DEBUG INFO] <-- Could not find a usable version of Winsock.dll\n");
+      WSACleanup();
+      exit(1);
+    }
+  #endif
 
   struct sockaddr_storage clientAddress;
   struct sockaddr_storage clientAddress_act;
@@ -128,16 +97,16 @@ int main(int argc, char *argv[]) {
   struct addrinfo hints;
   int iResult;
 
-#if defined __unix__ || defined __APPLE__
-  int s, ns;               // socket declaration
-  int ns_data, s_data_act; // socket declaration
-#elif defined _WIN32
-  SOCKET s, ns;
-  SOCKET ns_data, s_data_act;
-#endif
+  #if defined __unix__ || defined __APPLE__
+    int s, ns;               // socket declaration
+    int ns_data, s_data_act; // socket declaration
+  #elif defined _WIN32
+    SOCKET s, ns;
+    SOCKET ns_data, s_data_act;
+  #endif
 
-#define BUFFER_SIZE 500
-#define RBUFFER_SIZE 450
+  #define BUFFER_SIZE 500
+  #define RBUFFER_SIZE 450
 
   char send_buffer[BUFFER_SIZE], receive_buffer[BUFFER_SIZE];
   int n, bytes, addrlen;
@@ -146,20 +115,13 @@ int main(int argc, char *argv[]) {
   memset(&send_buffer, 0,BUFFER_SIZE);
   memset(&receive_buffer, 0, RBUFFER_SIZE);
 
-#if defined __unix__ || defined __APPLE__
-  ns_data = -1;
-#elif defined _WIN32
-  ns_data = INVALID_SOCKET;
-#endif
+  #if defined __unix__ || defined __APPLE__
+    ns_data = -1;
+  #elif defined _WIN32
+    ns_data = INVALID_SOCKET;
+  #endif
 
   int active = 0;
-
-  printf("\n============================================\n");
-  printf("   << 159.342 Cross-platform FTP Server Ver 2.0 >>");
-  printf("\n============================================\n");
-  printf("   submitted by: Greshka Lao, Any (Hoi Yi) Kwok");
-  printf("\n           date:     22/04/24");
-  printf("\n============================================\n");
 
   //********************************************************************
   // SOCKET
@@ -188,55 +150,54 @@ int main(int argc, char *argv[]) {
 
   if (iResult != 0) {
     printf("[DEBUG INFO] <-- getaddrinfo failed: %d\n", iResult);
-
-#if defined _WIN32
-    WSACleanup();
-#endif
+    #if defined _WIN32
+      WSACleanup();
+    #endif
     return 1;
   }
 
-#if defined __unix__ || defined __APPLE__
-  s = -1;
-#elif defined _WIN32
-  s = INVALID_SOCKET;
-#endif
+  #if defined __unix__ || defined __APPLE__
+    s = -1;
+  #elif defined _WIN32
+    s = INVALID_SOCKET;
+  #endif
 
   // SOCKET for the server to listen for client connections
   s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
-#if defined __unix__ || defined __APPLE__
-  if (s < 0) {
-    printf("[DEBUG INFO] <-- Socket failed\n");
-    freeaddrinfo(result);
-  }
-#elif defined _WIN32
-  // check for errors in socket allocation
-  if (s == INVALID_SOCKET) {
-    printf("[DEBUG INFO] <-- Error at socket(): %d\n", WSAGetLastError());
-    freeaddrinfo(result);
-    WSACleanup();
-    exit(1); // return 1;
-  }
-#endif
+  #if defined __unix__ || defined __APPLE__
+    if (s < 0) {
+      printf("[DEBUG INFO] <-- Socket failed\n");
+      freeaddrinfo(result);
+    }
+  #elif defined _WIN32
+    // check for errors in socket allocation
+    if (s == INVALID_SOCKET) {
+      printf("[DEBUG INFO] <-- Error at socket(): %d\n", WSAGetLastError());
+      freeaddrinfo(result);
+      WSACleanup();
+      exit(1); // return 1;
+    }
+  #endif
 
   //********************************************************************
   // BIND
   //********************************************************************
   iResult = bind(s, result->ai_addr, (int)result->ai_addrlen);
 
-// if error is detected, then clean-up
-#if defined __unix__ || defined __APPLE__
-  if (iResult == -1) {
-    printf("\n[DEBUG INFO] <-- bind failed\n");
-    freeaddrinfo(result);
-    close(s); // close socket
-#elif defined _WIN32
-  if (iResult == SOCKET_ERROR) {
-    printf("[DEBUG INFO] <-- bind failed with error: %d\n", WSAGetLastError());
-    freeaddrinfo(result);
-    closesocket(s);
-    WSACleanup();
-#endif
+  // if error is detected, then clean-up
+  #if defined __unix__ || defined __APPLE__
+    if (iResult == -1) {
+      printf("\n[DEBUG INFO] <-- bind failed\n");
+      freeaddrinfo(result);
+      close(s); // close socket
+  #elif defined _WIN32
+    if (iResult == SOCKET_ERROR) {
+      printf("[DEBUG INFO] <-- bind failed with error: %d\n", WSAGetLastError());
+      freeaddrinfo(result);
+      closesocket(s);
+      WSACleanup();
+  #endif
     return 1;
   }
 
@@ -245,20 +206,20 @@ int main(int argc, char *argv[]) {
   //********************************************************************
   // LISTEN
   //********************************************************************
-#if defined __unix__ || defined __APPLE__
-  if (listen(s, SOMAXCONN) == -1) {
-#elif defined _WIN32
-  if (listen(s, SOMAXCONN) == SOCKET_ERROR) {
-#endif
+  #if defined __unix__ || defined __APPLE__
+    if (listen(s, SOMAXCONN) == -1) {
+  #elif defined _WIN32
+    if (listen(s, SOMAXCONN) == SOCKET_ERROR) {
+  #endif
 
-#if defined __unix__ || defined __APPLE__
-    printf("\n[DEBUG INFO] <-- Listen failed\n");
-    close(s);
-#elif defined _WIN32
-    printf("[DEBUG INFO] <-- Listen failed with error: %d\n", WSAGetLastError());
-    closesocket(s);
-    WSACleanup();
-#endif
+  #if defined __unix__ || defined __APPLE__
+      printf("\n[DEBUG INFO] <-- Listen failed\n");
+      close(s);
+  #elif defined _WIN32
+      printf("[DEBUG INFO] <-- Listen failed with error: %d\n", WSAGetLastError());
+      closesocket(s);
+      WSACleanup();
+  #endif
 
     exit(1);
   }
@@ -276,66 +237,66 @@ int main(int argc, char *argv[]) {
     printf("SERVER is waiting for an incoming connection request at port:%s", portNum);
     printf("\n------------------------------------------------------------------------\n");
 
-#if defined __unix__ || defined __APPLE__
-    ns = accept(s, (struct sockaddr *)(&clientAddress), (socklen_t *)&addrlen);
-#elif defined _WIN32
-    ns = accept(s, (struct sockaddr *)(&clientAddress), &addrlen);
-#endif
+    #if defined __unix__ || defined __APPLE__
+        ns = accept(s, (struct sockaddr *)(&clientAddress), (socklen_t *)&addrlen);
+    #elif defined _WIN32
+        ns = accept(s, (struct sockaddr *)(&clientAddress), &addrlen);
+    #endif
 
-#if defined __unix__ || defined __APPLE__
-    if (ns == -1) {
-      printf("\n[DEBUG INFO] <-- accept failed\n");
-      close(s);
-      return 1;
-    } else {
-      int returnValue;
-      memset(clientHost, 0, sizeof(clientHost));
-      memset(clientService, 0, sizeof(clientService));
-
-      returnValue = getnameinfo(
-          (struct sockaddr *)&clientAddress, addrlen,    // addr infor
-          clientHost, sizeof(clientHost), clientService, // ip address
-          sizeof(clientService), NI_NUMERICHOST);        // port
-
-      if (returnValue != 0) {
-        printf("\n[DEBUG INFO] <--  getnameinfo() failed \n");
-        exit(1);
-      } else {
-        printf("\n============================================================================\n");
-        printf(
-            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s",
-            clientHost, clientService, portNum);
-        printf("\n============================================================================\n");
-      }
-    }
-#elif defined _WIN32
-
-    if (ns == INVALID_SOCKET) {
-      printf("[DEBUG INFO] <-- accept failed: %d\n", WSAGetLastError());
-      closesocket(s);
-      WSACleanup();
-      return 1;
-
-    } else {
-      DWORD returnValue;
-      memset(clientHost, 0, sizeof(clientHost));
-      memset(clientService, 0, sizeof(clientService));
-
-      returnValue = getnameinfo(
-          (struct sockaddr *)&clientAddress, addrlen, clientHost,
-          sizeof(clientHost), clientService, sizeof(clientService),NI_NUMERICHOST);
-      if (returnValue != 0) {
-        printf("\n[DEBUG INFO] <--  getnameinfo() failed with error#%d\n", WSAGetLastError());
-        exit(1);
-      } else {
-        printf("\n============================================================================\n");
-        printf(
-            "\nConnected to [Client's IP %s, port %s] through SERVER's port %s", clientHost, clientService, portNum);
-        printf("\n============================================================================\n");
-      }
-    }
-
-#endif
+    #if defined __unix__ || defined __APPLE__
+        if (ns == -1) {
+          printf("\n[DEBUG INFO] <-- accept failed\n");
+          close(s);
+          return 1;
+        } else {
+          int returnValue;
+          memset(clientHost, 0, sizeof(clientHost));
+          memset(clientService, 0, sizeof(clientService));
+    
+          returnValue = getnameinfo(
+              (struct sockaddr *)&clientAddress, addrlen,    // addr infor
+              clientHost, sizeof(clientHost), clientService, // ip address
+              sizeof(clientService), NI_NUMERICHOST);        // port
+    
+          if (returnValue != 0) {
+            printf("\n[DEBUG INFO] <--  getnameinfo() failed \n");
+            exit(1);
+          } else {
+            printf("\n============================================================================\n");
+            printf(
+                "\nConnected to [Client's IP %s, port %s] through SERVER's port %s",
+                clientHost, clientService, portNum);
+            printf("\n============================================================================\n");
+          }
+        }
+    #elif defined _WIN32
+    
+        if (ns == INVALID_SOCKET) {
+          printf("[DEBUG INFO] <-- accept failed: %d\n", WSAGetLastError());
+          closesocket(s);
+          WSACleanup();
+          return 1;
+    
+        } else {
+          DWORD returnValue;
+          memset(clientHost, 0, sizeof(clientHost));
+          memset(clientService, 0, sizeof(clientService));
+    
+          returnValue = getnameinfo(
+              (struct sockaddr *)&clientAddress, addrlen, clientHost,
+              sizeof(clientHost), clientService, sizeof(clientService),NI_NUMERICHOST);
+          if (returnValue != 0) {
+            printf("\n[DEBUG INFO] <--  getnameinfo() failed with error#%d\n", WSAGetLastError());
+            exit(1);
+          } else {
+            printf("\n============================================================================\n");
+            printf(
+                "\nConnected to [Client's IP %s, port %s] through SERVER's port %s", clientHost, clientService, portNum);
+            printf("\n============================================================================\n");
+          }
+        }
+    
+    #endif
 
     //********************************************************************
     // Respond with welcome message
@@ -358,13 +319,13 @@ int main(int argc, char *argv[]) {
         bytes = recv(ns, &receive_buffer[n], 1, 0); // receive byte by byte...
 
         // 1st error checking before handling data
-#if defined __unix__ || defined __APPLE__
+      #if defined __unix__ || defined __APPLE__
         if ((bytes == -1) || (bytes == 0))
           break;
-#elif defined _WIN32
+      #elif defined _WIN32
         if ((bytes == SOCKET_ERROR) || (bytes == 0))
           break;
-#endif
+      #endif
 
         if (receive_buffer[n] == '\n') { /*end on a LF*/
           receive_buffer[n] = '\0';
@@ -377,14 +338,14 @@ int main(int argc, char *argv[]) {
       if (bytes == 0)
         printf("\nClient has gracefully exited.\n");
 
-// 2nd error checking after receiving data
-#if defined __unix__ || defined __APPLE__
-      if ((bytes == -1) || (bytes == 0))
-        break;
-#elif defined _WIN32
-      if ((bytes == SOCKET_ERROR) || (bytes == 0))
-        break;
-#endif
+      // 2nd error checking after receiving data
+      #if defined __unix__ || defined __APPLE__
+            if ((bytes == -1) || (bytes == 0))
+              break;
+      #elif defined _WIN32
+            if ((bytes == SOCKET_ERROR) || (bytes == 0))
+              break;
+      #endif
       printf("Command received:  '%s\\r\\n' \n", receive_buffer);
 
       //********************************************************************
